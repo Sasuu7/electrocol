@@ -151,6 +151,7 @@ select.inp{appearance:none}
     <div class="cc feat" onclick="go('s-motores')"><div class="ci ic-r">⚡</div><div class="cn">Arranque de Motores</div><div class="cd">DOL, Y-Δ, Soft-starter, VFD</div><div class="cnorm">RETIE Art.18</div></div>
     <div class="cc feat" onclick="go('s-conexion');setTimeout(initConexion,50)"><div class="ci ic-b">🔌</div><div class="cn">Conexión de Motores</div><div class="cd">Triángulo, estrella, inversión</div><div class="cnorm">NTC 2050 · IEC</div></div>
     <div class="cc feat" onclick="go('s-energia')" style="grid-column:1/-1"><div class="ci ic-y">⚡</div><div class="cn">Consumo Energético</div><div class="cd">kWh, costo en pesos, análisis por motor</div><div class="cnorm">UPME · XM · Tarifa CU</div></div>
+    <div class="cc feat" onclick="go('s-tablas')" style="grid-column:1/-1"><div class="ci ic-g">📋</div><div class="cn">Tablas de Referencia</div><div class="cd">Conductores, protecciones, calibres, NTC 2050</div><div class="cnorm">NTC 2050 · RETIE</div></div>
   </div>
 
   <div class="sl">Próximamente</div>
@@ -633,8 +634,12 @@ select.inp{appearance:none}
     <div class="rb">
       <div class="rbt" id="r-lc2-title">Contactor KM1</div>
       <div class="rr"><div class="rrl" id="r-lc2">Corriente mínima</div><div class="rrv b" id="r-cont">—</div></div>
-      <div class="rr"><div class="rrl">Unidad</div><div class="rrv" id="r-uc2">A AC-3</div></div>
+      <div class="rr" id="rr-uc2"><div class="rrl">Unidad</div><div class="rrv" id="r-uc2">A AC-3</div></div>
       <div class="rr"><div class="rrl">Norma</div><div class="rrv g" id="r-nc2">IEC 60947-4</div></div>
+      <div class="rr" id="rr-gdial" style="display:none">
+        <div class="rrl" style="display:flex;align-items:center;gap:5px"><span>Ajuste del dial en campo</span><span style="font-size:8px;background:rgba(232,64,12,0.15);color:var(--pr);border-radius:4px;padding:1px 6px;font-weight:600">IMPORTANTE</span></div>
+        <div class="rrv" style="color:var(--pr);font-weight:700" id="r-gdial">—</div>
+      </div>
     </div>
     <div id="r-motorinfo" style="display:none;background:var(--crd);border:1px solid var(--bd);border-radius:10px;padding:9px 12px;margin-bottom:8px;font-size:9px;color:var(--mut)">
       <span style="color:var(--acc);font-weight:600">Motor: </span><span id="r-motorinfo-txt"></span>
@@ -655,12 +660,8 @@ select.inp{appearance:none}
       <div class="rbt" id="r-bprot">Relé Térmico RT1</div>
       <div class="rr" id="rr-rele"><div class="rrl">Ajuste relé (FLA × FS)</div><div class="rrv y" id="r-rele">—</div></div>
       <div class="rr" id="rr-relm"><div class="rrl">Máx. NTC Art.430.32</div><div class="rrv" id="r-relm">—</div></div>
-      <div class="rr" id="rr-gd" style="display:none"><div class="rrl">Rango guardamotor</div><div class="rrv g" id="r-gd">—</div></div>
-      <div class="rr" id="rr-gdial" style="display:none">
-        <div class="rrl" style="display:flex;align-items:center;gap:5px"><span>Ajuste del dial en campo</span><span style="font-size:8px;background:rgba(232,64,12,0.15);color:var(--pr);border-radius:4px;padding:1px 6px;font-weight:600">IMPORTANTE</span></div>
-        <div class="rrv" style="color:var(--pr);font-weight:700" id="r-gdial">—</div>
-      </div>
-      <div class="rr" id="rr-gdn" style="display:none"><div class="rrl">Norma</div><div class="rrv g">IEC 60947-2 · MPCB</div></div>
+      <div class="rr" id="rr-km1ie" style="display:none"><div class="rrl">Corriente mínima (Ie)</div><div class="rrv b" id="r-km1ie">—</div></div>
+      <div class="rr" id="rr-km1n" style="display:none"><div class="rrl">Norma</div><div class="rrv g">IEC 60947-4 · Cat. AC-3</div></div>
     </div>
 
     <div class="rb">
@@ -796,6 +797,36 @@ select.inp{appearance:none}
       <button onclick="modalConfirmarBorrar(true)" style="flex:1;padding:10px;background:rgba(232,64,12,0.15);border:1px solid rgba(232,64,12,0.5);border-radius:8px;color:#E8400C;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;cursor:pointer">Sí, borrar</button>
     </div>
   </div>
+</div>
+
+<!-- ═══ TABLAS ═══ -->
+<div class="screen" id="s-tablas">
+  <div class="hdr">
+    <div class="back" onclick="go('s-industrial')">←</div>
+    <div class="ht">Tablas de Referencia</div>
+    <div class="hb">NTC 2050 · RETIE</div>
+  </div>
+  <div class="sl">Referencia rápida · Selecciona una tabla</div>
+
+  <!-- Lista de tablas disponibles -->
+  <div class="plist" id="tablas-menu">
+    <!-- Las tablas se irán añadiendo aquí -->
+    <div style="margin:32px 0;text-align:center;color:var(--mut);font-size:11px;line-height:1.8">
+      <div style="font-size:28px;margin-bottom:10px">📋</div>
+      <div>Las tablas de referencia se agregarán próximamente.</div>
+      <div style="font-size:9px;margin-top:6px;color:rgba(143,163,180,0.5)">NTC 2050 · RETIE · IEC</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TABLAS DETALLE ═══ -->
+<div class="screen" id="s-tabla-detalle">
+  <div class="hdr">
+    <div class="back" onclick="go('s-tablas')">←</div>
+    <div class="ht" id="tabla-detalle-titulo">Tabla</div>
+    <div class="hb" id="tabla-detalle-norma">NTC 2050</div>
+  </div>
+  <div id="tabla-detalle-body" style="padding:12px 16px 0"></div>
 </div>
 
 <!-- NAV -->
@@ -1155,7 +1186,7 @@ function initConexion(){
 }
 
 // ── Navegación ────────────────────────────────────────────────────────────────
-const NM={'s-home':'n-home','s-industrial':'n-home','s-motores':'n-home','s-dol':'n-home','s-conexion':'n-home','s-energia':'n-home','s-historial-dol':'n-hist','s-historial-energia':'n-hist','s-normas':'n-norm','s-perfil':'n-perf'};
+const NM={'s-home':'n-home','s-industrial':'n-home','s-motores':'n-home','s-dol':'n-home','s-conexion':'n-home','s-energia':'n-home','s-historial-dol':'n-hist','s-historial-energia':'n-hist','s-normas':'n-norm','s-perfil':'n-perf','s-tablas':'n-home','s-tabla-detalle':'n-home'};
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
@@ -1380,38 +1411,38 @@ function renderResultados(){
   }
 
   if(gm){
-    // Bloque 1: Guardamotor MPCB (rango)
+    // Bloque 1: Guardamotor QM1
     document.getElementById('r-lc2-title').textContent='Guardamotor QM1 (MPCB)';
     document.getElementById('r-lc2').textContent='Rango ajustable';
     document.getElementById('r-cont').textContent=d.gmin+'–'+d.gmax+' A';
-    document.getElementById('r-uc2').textContent='IEC 60947-2';
+    document.getElementById('rr-uc2').style.display='none';
     document.getElementById('r-nc2').textContent='IEC 60947-2';
+    document.getElementById('rr-gdial').style.display='flex';
+    document.getElementById('r-gdial').textContent=d.gdial+' A  (= FLA placa · girar dial a este valor)';
     // Bloque 2: Contactor KM1
     document.getElementById('r-bprot').textContent='Contactor KM1 (Cat. AC-3)';
     document.getElementById('rr-rele').style.display='none';
     document.getElementById('rr-relm').style.display='none';
-    document.getElementById('rr-gd').style.display='flex';
-    document.getElementById('rr-gdial').style.display='flex';
-    document.getElementById('rr-gdn').style.display='flex';
-    document.getElementById('r-gd').textContent=d.gmin+'–'+d.gmax+' A';
-    document.getElementById('r-gdial').textContent=d.gdial+' A  (= FLA placa · girar dial a este valor)';
-    // Reutilizar rr-gdn para la norma del contactor
-    document.querySelector('#rr-gdn .rrv').textContent='IEC 60947-2 · MPCB';
+    document.getElementById('rr-km1ie').style.display='flex';
+    document.getElementById('rr-km1n').style.display='flex';
+    document.getElementById('r-km1ie').textContent='>= '+d.flc+' A';
   } else {
+    // Bloque 1: Contactor KM1
     document.getElementById('r-lc2-title').textContent='Contactor KM1';
     document.getElementById('r-lc2').textContent='Corriente mínima';
     document.getElementById('r-cont').textContent='>= '+d.flc+' A';
+    document.getElementById('rr-uc2').style.display='flex';
     document.getElementById('r-uc2').textContent='A AC-3';
     document.getElementById('r-nc2').textContent='IEC 60947-4';
+    document.getElementById('rr-gdial').style.display='none';
+    // Bloque 2: Relé Térmico RT1
     document.getElementById('r-bprot').textContent='Relé Térmico RT1';
     document.getElementById('rr-rele').style.display='flex';
     document.getElementById('rr-relm').style.display='flex';
-    document.getElementById('rr-gd').style.display='none';
-    document.getElementById('rr-gdial').style.display='none';
-    document.getElementById('rr-gdn').style.display='none';
+    document.getElementById('rr-km1ie').style.display='none';
+    document.getElementById('rr-km1n').style.display='none';
     document.getElementById('r-rele').textContent=d.rele+' A';
     document.getElementById('r-relm').textContent=d.relm+' A  (FLA × '+(parseFloat(d.fs)>=1.15?'1.25':'1.15')+')';
-    document.querySelector('#rr-gdn .rrv').textContent='IEC 60947-2 · MPCB';
   }
 
   document.getElementById('rb-ocpd').style.display=gm?'none':'block';
@@ -2085,16 +2116,16 @@ const CONT_REFS=[
 const RELE_REFS=[
   {min:0.1, max:0.63,refs:['LRD04 (0.4-0.63A)','TA25DU-0.63 (0.4-0.63A)','RW17-1D1 (0.4-0.63A)','NR4-25 (0.4-0.63A)','3RU2116-0AB0 (0.45-0.63A)','193-EED1*B (0.1-0.5A)']},
   {min:0.63,max:1.0, refs:['LRD05 (0.63-1A)','TA25DU-1 (0.63-1A)','RW17-1D1 (0.63-1A)','NR4-25 (0.63-1A)','3RU2116-0BB0 (0.7-1A)','193-EED2*B (0.5-1A)']},
-  {min:1.0, max:1.6, refs:['LRD07 (1-1.6A)','TA25DU-1.4 (1-1.4A)','RW17-1D1 (1-1.6A)','NR4-25 (1-1.6A)','3RU2116-0EB0 (1.1-1.6A)','193-EED3*B (1-2A)']},
-  {min:1.6, max:2.5, refs:['LRD08 (1.6-2.5A)','TA25DU-2.4 (1.7-2.4A)','RW17-1D1 (1.6-2.5A)','NR4-25 (1.6-2.5A)','3RU2116-0GB0 (1.8-2.5A)','193-EED4*B (2-4A)']},
-  {min:2.5, max:4.0, refs:['LRD09 (2.5-4A)','TA25DU-4 (2.8-4A)','RW17-1D1 (2.5-4A)','NR4-25 (2.5-4A)','3RU2116-1BB0 (2.8-4A)','193-EED4*B (2-4A)']},
+  {min:1.0, max:1.6, refs:['LRD06 (1-1.6A)','TA25DU-1.4 (1-1.4A)','RW17-1D1 (1-1.6A)','NR4-25 (1-1.6A)','3RU2116-0EB0 (1.1-1.6A)','193-EED3*B (1-2A)']},
+  {min:1.6, max:2.5, refs:['LRD07 (1.6-2.5A)','TA25DU-2.4 (1.7-2.4A)','RW17-1D1 (1.6-2.5A)','NR4-25 (1.6-2.5A)','3RU2116-0GB0 (1.8-2.5A)','193-EED4*B (2-4A)']},
+  {min:2.5, max:4.0, refs:['LRD08 (2.5-4A)','TA25DU-4 (2.8-4A)','RW17-1D1 (2.5-4A)','NR4-25 (2.5-4A)','3RU2116-1BB0 (2.8-4A)','193-EED4*B (2-4A)']},
   {min:4.0, max:6.3, refs:['LRD10 (4-6A)','TA25DU-6.5 (4.5-6.5A)','RW17-1D1 (4-6.3A)','NR4-25 (4-6.3A)','3RU2116-1GB0 (4.5-6.3A)','193-EED5*B (4-8A)']},
-  {min:6.3, max:10,  refs:['LRD12 (7-10A)','TA25DU-11 (7-11A)','RW17-1D1 (6.3-10A)','NR4-25 (6.3-10A)','3RU2116-1HB0 (7-10A)','193-EED5*B (4-8A)']},
-  {min:10,  max:16,  refs:['LRD14 (10-14A)','TA25DU-19 (13-19A)','RW17-1D3 (10-16A)','NR4-25 (10-16A)','3RU2126-4AB0 (11-16A)','193-EEGE*B (9-18A)']},
-  {min:16,  max:24,  refs:['LRD16 (11-17A)','TA42DU-25 (18-25A)','RW27-1D3 (16-22A)','NR4-63 (17-25A)','3RU2126-4CB0 (17-22A)','193-EEGE*B (9-18A)']},
-  {min:24,  max:34,  refs:['LRD21 (17-25A)','TA42DU-32 (22-32A)','RW27-1D3 (24-32A)','NR4-63 (25-34A)','3RU2126-4DB0 (22-32A)','193-EEGE*B (18-36A)']},
-  {min:34,  max:45,  refs:['LRD325 (23-32A)','TA75DU-52 (36-52A)','RW27-1D3 (32-45A)','NR4-63 (34-45A)','3RU2136-4EB0 (28-40A)','193-EEGE*B (18-36A)']},
-  {min:45,  max:65,  refs:['LRD332 (30-40A)','TA75DU-63 (45-63A)','RW27-1D3 (45-65A)','NR4-63 (45-63A)','3RU2136-4FB0 (45-63A)','193-EEGE*B (36-72A)']},
+  {min:6.3, max:10,  refs:['LRD12 (5.5-8A)','TA25DU-11 (7-11A)','RW17-1D1 (6.3-10A)','NR4-25 (6.3-10A)','3RU2116-1HB0 (7-10A)','193-EED5*B (4-8A)']},
+  {min:10,  max:16,  refs:['LRD14 (7-10A)','TA25DU-19 (13-19A)','RW17-1D3 (10-16A)','NR4-25 (10-16A)','3RU2126-4AB0 (11-16A)','193-EEGE*B (9-18A)']},
+  {min:16,  max:24,  refs:['LRD16 (9-13A)','TA42DU-25 (18-25A)','RW27-1D3 (16-22A)','NR4-63 (17-25A)','3RU2126-4CB0 (17-22A)','193-EEGE*B (9-18A)']},
+  {min:24,  max:34,  refs:['LRD21 (12-18A)','TA42DU-32 (22-32A)','RW27-1D3 (24-32A)','NR4-63 (25-34A)','3RU2126-4DB0 (22-32A)','193-EEGE*B (18-36A)']},
+  {min:34,  max:45,  refs:['LRD32 (23-32A)','TA75DU-52 (36-52A)','RW27-1D3 (32-45A)','NR4-63 (34-45A)','3RU2136-4EB0 (28-40A)','193-EEGE*B (18-36A)']},
+  {min:45,  max:65,  refs:['LRD35 (30-40A)','TA75DU-63 (45-63A)','RW27-1D3 (45-65A)','NR4-63 (45-63A)','3RU2136-4FB0 (45-63A)','193-EEGE*B (36-72A)']},
   {min:65,  max:90,  refs:['LRD340 (55-70A)','TA75DU-90 (60-90A)','RW27-1D3 (63-85A)','NR4-63 (63-90A)','3RU2136-4HB0 (63-90A)','193-EEGE*B (72-108A)']},
 ];
 
@@ -2108,14 +2139,15 @@ const GUARD_REFS=[
   {min:1.0, max:1.6, refs:['GV2-ME06 (1-1.6A)','MS116-1.6 (1-1.6A)','MPW18-3-U016 (1-1.6A)','NS2-25 (1-1.6A)','3RV2011-1AA10 (0.9-1.25A)','140M-C2E-B25 (0.25-2.5A)']},
   {min:1.6, max:2.5, refs:['GV2-ME07 (1.6-2.5A)','MS116-2.5 (1.6-2.5A)','MPW18-3-U025 (1.6-2.5A)','NS2-25 (1.6-2.5A)','3RV2011-1BA10 (1.1-1.6A)','140M-C2E-B25 (0.25-2.5A)']},
   {min:2.5, max:4.0, refs:['GV2-ME08 (2.5-4A)','MS116-4 (2.5-4A)','MPW18-3-U040 (2.5-4A)','NS2-25 (2.5-4A)','3RV2011-1EA10 (2.2-3.2A)','140M-C2E-C32 (2.5-4A)']},
-  {min:4.0, max:6.3, refs:['GV2-ME10 (4-6.3A)','MS116-6.3 (4-6.3A)','MPW18-3-D063 (4-6.3A)','NS2-25 (4-6.3A)','3RV2011-1FA10 (3.5-5A)','140M-C2E-C63 (4-6.3A)']},
+  {min:4.0, max:6.0, refs:['GV2-ME10 (4-6A)','MS116-6.3 (4-6.3A)','MPW18-3-D063 (4-6.3A)','NS2-25 (4-6.3A)','3RV2011-1FA10 (3.5-5A)','140M-C2E-C63 (4-6.3A)']},
   {min:6.3, max:10,  refs:['GV2-ME14 (6-10A)','MS116-10 (6.3-10A)','MPW18-3-D100 (6.3-10A)','NS2-25 (6.3-10A)','3RV2011-1GA10 (4.5-6.3A)','140M-C2E-C10 (6.3-10A)']},
-  {min:10,  max:16,  refs:['GV2-ME16 (10-16A)','MS132-16 (10-16A)','MPW40-3-D160 (10-16A)','NS2-25 (10-16A)','3RV2021-1EA10 (3.5-5A)','140M-C2E-C16 (10-16A)']},
-  {min:16,  max:25,  refs:['GV2-ME20 (16-25A)','MS132-25 (16-25A)','MPW40-3-D250 (16-25A)','NS2-25 (16-25A)','3RV2021-4AA10 (11-16A)','140M-C2E-C25 (16-25A)']},
-  {min:25,  max:32,  refs:['GV2-ME22 (20-32A)','MS132-32 (20-32A)','MPW40-3-D320 (20-32A)','NS2-25 (25-32A)','3RV2021-4DA10 (22-32A)','140M-C2E-C32 (25-32A)']},
-  {min:32,  max:40,  refs:['GV2-ME25 (30-40A)','MS132-40 (26-40A)','MPW40-3-D400 (25-40A)','NS2-25 (32-40A)','3RV2021-4EA10 (27-32A)','140M-F8E-C40 (32-40A)']},
-  {min:40,  max:57,  refs:['GV2-ME28 (40-50A)','MS165-54 (36-54A)','MPW65-3-D570 (40-57A)','NS2-25 (40-57A)','3RV2031-4EA10 (35-50A)','140M-F8E-C57 (40-57A)']},
-  {min:57,  max:80,  refs:['GV2-ME32 (50-63A)','MS165-80 (54-80A)','MPW65-3-D800 (50-80A)','NS2-25 (57-80A)','3RV2031-4FA10 (45-63A)','140M-F8E-C80 (57-80A)']},
+  {min:9,   max:14,  refs:['GV2-ME16 (9-14A)','MS132-16 (10-16A)','MPW40-3-D160 (10-16A)','NS2-25 (10-16A)','3RV2021-1EA10 (3.5-5A)','140M-C2E-C16 (10-16A)']},
+  {min:13,  max:18,  refs:['GV2-ME20 (13-18A)','MS132-25 (16-25A)','MPW40-3-D250 (16-25A)','NS2-25 (16-25A)','3RV2021-4AA10 (11-16A)','140M-C2E-C25 (16-25A)']},
+  {min:17,  max:23,  refs:['GV2-ME21 (17-23A)','MS132-25 (16-25A)','MPW40-3-D250 (16-25A)','NS2-25 (17-25A)','3RV2021-4BA10 (14-20A)','140M-C2E-C25 (16-25A)']},
+  {min:20,  max:25,  refs:['GV2-ME22 (20-25A)','MS132-32 (20-32A)','MPW40-3-D320 (20-32A)','NS2-25 (20-32A)','3RV2021-4DA10 (22-32A)','140M-C2E-C32 (20-32A)']},
+  {min:25,  max:40,  refs:['GV3-ME40 (25-40A)','MS132-40 (26-40A)','MPW40-3-D400 (25-40A)','NS2-25 (25-40A)','3RV2021-4EA10 (27-32A)','140M-F8E-C40 (32-40A)']},
+  {min:40,  max:63,  refs:['GV3-ME63 (40-63A)','MS165-54 (36-54A)','MPW65-3-D570 (40-57A)','NS2-25 (40-57A)','3RV2031-4EA10 (35-50A)','140M-F8E-C57 (40-57A)']},
+  {min:63,  max:80,  refs:['GV3-ME80 (63-80A)','MS165-80 (54-80A)','MPW65-3-D800 (50-80A)','NS2-25 (57-80A)','3RV2031-4FA10 (45-63A)','140M-F8E-C80 (57-80A)']},
 ];
 
 // BREAKERS ITM — selección por corriente nominal — 60Hz Colombia
@@ -3491,6 +3523,1248 @@ function _buildEnergiaPDF(){
     showToast('Error generando PDF: '+e.message);
   }
 }
+
+// ── Módulo Tablas ────────────────────────────────────────────────────────────
+const TABLAS_DATA = {
+
+  // ── TABLA 1: Equivalencia HP ↔ kW ────────────────────────────────────────
+  'hp-kw': {
+    nombre: 'Equivalencia HP ↔ kW',
+    norma: 'NTC 2050 · IEC 60034',
+    desc: 'Potencias normalizadas de motores',
+    color: 'var(--pr)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">⚡ Potencias normalizadas de motores eléctricos</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Art. 430 · IEC 60034 · 1 HP = 0.7457 kW</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--pr);font-weight:700">HP</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--acc);font-weight:700">kW</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">kVA aprox.</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--mut);font-weight:600">Uso típico</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['1/4','0.19','0.24','Bombas pequeñas'],
+                ['1/3','0.25','0.31','Ventiladores'],
+                ['1/2','0.37','0.46','Compresores mini'],
+                ['3/4','0.56','0.70','Bandas pequeñas'],
+                ['1','0.75','0.94','Bombas domest.'],
+                ['1.5','1.12','1.40','Tornos pequeños'],
+                ['2','1.49','1.87','Compresores'],
+                ['3','2.24','2.80','Trituradores'],
+                ['5','3.73','4.66','Bombas industria'],
+                ['7.5','5.59','6.99','Ventiladores ind.'],
+                ['10','7.46','9.33','Compresores med.'],
+                ['15','11.19','13.99','Molinos'],
+                ['20','14.92','18.65','Bombas grandes'],
+                ['25','18.64','23.30','Compresores grd.'],
+                ['30','22.37','27.96','Extrusoras'],
+                ['40','29.83','37.29','Trituradoras'],
+                ['50','37.28','46.60','Centrífugas'],
+                ['60','44.74','55.93','Bombas alta cap.'],
+                ['75','55.93','69.91','Molinos grandes'],
+                ['100','74.57','93.21','Plantas grandes'],
+                ['125','93.21','116.51','Industrial pesada'],
+                ['150','111.85','139.81','Minería'],
+                ['200','149.14','186.42','Gran industria'],
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:6px 8px;color:var(--pr);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[0]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--acc);font-weight:600">${r[1]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--grn)">${r[2]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:9px">${r[3]}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(255,183,3,0.07);border:1px solid rgba(255,183,3,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.6">
+        <b style="color:var(--acc)">Fórmula:</b> kW = HP × 0.7457 &nbsp;|&nbsp; HP = kW ÷ 0.7457<br>
+        <b style="color:var(--acc)">Norma:</b> Potencias según series R5/R10 IEC 60034-1 adoptadas en NTC 2050
+      </div>`
+  },
+
+  // ── TABLA 2: Corriente nominal motores trifásicos 220 V ─────────────────
+  'corriente-tri-220': {
+    nombre: 'Corriente nominal · 3φ 220 V',
+    norma: 'NTC 2050 Tabla 430-150',
+    desc: 'Amperaje motores trifásicos a 220 V',
+    color: 'var(--grn)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">⚡ Motores trifásicos — 220 V · 60 Hz · fp = 0.85</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Tabla 430-150 · RETIE Art. 18 · Red colombiana 220 V</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--pr);font-weight:700">HP</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--acc);font-weight:700">kW</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">I nominal (A)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--blu);font-weight:600">I arranque (A)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['1/2','0.37','2.5','17.5'],
+                ['3/4','0.56','3.5','24.5'],
+                ['1','0.75','4.6','32.2'],
+                ['1.5','1.12','6.6','46.2'],
+                ['2','1.49','7.5','52.5'],
+                ['3','2.24','10.8','75.6'],
+                ['5','3.73','17.5','122.5'],
+                ['7.5','5.59','25.3','177.1'],
+                ['10','7.46','32.2','225.4'],
+                ['15','11.19','48.3','338.1'],
+                ['20','14.92','62.1','434.7'],
+                ['25','18.64','78.2','547.4'],
+                ['30','22.37','92.0','644.0'],
+                ['40','29.83','120.0','840.0'],
+                ['50','37.28','150.0','1050.0'],
+                ['60','44.74','177.0','1239.0'],
+                ['75','55.93','221.0','1547.0'],
+                ['100','74.57','285.0','1995.0'],
+                ['125','93.21','359.0','2513.0'],
+                ['150','111.85','414.0','2898.0'],
+                ['200','149.14','552.0','3864.0'],
+              ].map((r,i)=>{
+                const ia = parseFloat(r[2]);
+                let col = ia<=50?'var(--grn)':ia<=150?'var(--acc)':'var(--pr)';
+                return `<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                  <td style="padding:6px 8px;color:var(--pr);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[0]}</td>
+                  <td style="padding:6px 8px;text-align:center;color:var(--acc)">${r[1]}</td>
+                  <td style="padding:6px 8px;text-align:center;color:${col};font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[2]} A</td>
+                  <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:9px">~${r[3]} A</td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(255,183,3,0.07);border:1px solid rgba(255,183,3,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.6">
+        <b style="color:var(--acc)">Fórmula:</b> I = (HP × 746) ÷ (√3 × V × η × fp) &nbsp;·&nbsp; η ≈ 0.90 · fp ≈ 0.85<br>
+        <b style="color:var(--acc)">Arranque DOL:</b> I_arranque ≈ 7 × I_nominal (típico motores estándar)
+      </div>`
+  },
+
+  // ── TABLA 3: Corriente nominal motores trifásicos 440 V ─────────────────
+  'corriente-tri-440': {
+    nombre: 'Corriente nominal · 3φ 440 V',
+    norma: 'NTC 2050 Tabla 430-150',
+    desc: 'Amperaje motores trifásicos a 440 V',
+    color: 'var(--grn)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">⚡ Motores trifásicos — 440 V · 60 Hz · fp = 0.85</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Tabla 430-150 · RETIE Art. 18 · Red colombiana 440 V</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--pr);font-weight:700">HP</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--acc);font-weight:700">kW</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">I nominal (A)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--blu);font-weight:600">I arranque (A)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['1/2','0.37','1.3','9.1'],
+                ['3/4','0.56','1.8','12.6'],
+                ['1','0.75','2.3','16.1'],
+                ['1.5','1.12','3.3','23.1'],
+                ['2','1.49','3.8','26.6'],
+                ['3','2.24','5.4','37.8'],
+                ['5','3.73','8.8','61.6'],
+                ['7.5','5.59','12.6','88.2'],
+                ['10','7.46','16.1','112.7'],
+                ['15','11.19','24.2','169.4'],
+                ['20','14.92','31.0','217.0'],
+                ['25','18.64','39.1','273.7'],
+                ['30','22.37','46.0','322.0'],
+                ['40','29.83','60.0','420.0'],
+                ['50','37.28','75.0','525.0'],
+                ['60','44.74','88.5','619.5'],
+                ['75','55.93','110.5','773.5'],
+                ['100','74.57','142.5','997.5'],
+                ['125','93.21','179.5','1256.5'],
+                ['150','111.85','207.0','1449.0'],
+                ['200','149.14','276.0','1932.0'],
+              ].map((r,i)=>{
+                const ia = parseFloat(r[2]);
+                let col = ia<=30?'var(--grn)':ia<=80?'var(--acc)':'var(--pr)';
+                return `<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                  <td style="padding:6px 8px;color:var(--pr);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[0]}</td>
+                  <td style="padding:6px 8px;text-align:center;color:var(--acc)">${r[1]}</td>
+                  <td style="padding:6px 8px;text-align:center;color:${col};font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[2]} A</td>
+                  <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:9px">~${r[3]} A</td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(255,183,3,0.07);border:1px solid rgba(255,183,3,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.6">
+        <b style="color:var(--acc)">Nota:</b> I_440V = I_220V ÷ 2 (relación de transformación)<br>
+        <b style="color:var(--acc)">Ventaja:</b> A 440 V se reduce la corriente a la mitad → cables más delgados y menor caída de tensión
+      </div>`
+  },
+
+  // ── TABLA 4: Calibres cable cobre THW/THWN 60°C ──────────────────────────
+  'calibres-cobre': {
+    nombre: 'Calibres cable cobre THW/THWN',
+    norma: 'NTC 2050 Tabla 310-16',
+    desc: 'Capacidad amp. cobre aislamiento 60°C–75°C',
+    color: 'var(--acc)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">🔌 Conductores de cobre — Aislamiento THW / THWN</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Tabla 310-16 · RETIE Art. 14 · Temperatura ambiente 30°C · Ducto conduit</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--acc);font-weight:700">Calibre AWG/kcmil</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">60°C (A)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--pr);font-weight:700">75°C (A)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--mut);font-weight:600">Sección mm²</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['14 AWG','15','20','2.08'],
+                ['12 AWG','20','25','3.31'],
+                ['10 AWG','30','35','5.26'],
+                ['8 AWG','40','50','8.37'],
+                ['6 AWG','55','65','13.3'],
+                ['4 AWG','70','85','21.1'],
+                ['3 AWG','85','100','26.7'],
+                ['2 AWG','95','115','33.6'],
+                ['1 AWG','110','130','42.4'],
+                ['1/0 AWG','125','150','53.5'],
+                ['2/0 AWG','145','175','67.4'],
+                ['3/0 AWG','165','200','85.0'],
+                ['4/0 AWG','195','230','107'],
+                ['250 kcmil','215','255','127'],
+                ['300 kcmil','240','285','152'],
+                ['350 kcmil','260','310','177'],
+                ['400 kcmil','280','335','203'],
+                ['500 kcmil','320','380','253'],
+                ['600 kcmil','355','420','304'],
+                ['750 kcmil','400','475','380'],
+                ['1000 kcmil','455','545','507'],
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:6px 8px;color:var(--acc);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:12px">${r[0]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--grn);font-weight:600">${r[1]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--pr);font-weight:600">${r[2]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:9px">${r[3]}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(255,183,3,0.07);border:1px solid rgba(255,183,3,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
+        <b style="color:var(--acc)">NTC 2050 Art. 310:</b> El calibre mínimo para circuitos derivados es #14 AWG (15A)<br>
+        <b style="color:var(--acc)">Factor de corrección:</b> Para temperaturas &gt; 30°C aplicar factor de la tabla 310-16<br>
+        <b style="color:var(--acc)">3 conductores en ducto:</b> Aplicar factor 0.80 si hay más de 3 conductores cargados<br>
+        <b style="color:var(--pr)">RETIE:</b> Cable mínimo para motores = 125% × I_nominal del motor
+      </div>`
+  },
+
+  // ── TABLA 5: Calibres cable aluminio THWN ────────────────────────────────
+  'calibres-aluminio': {
+    nombre: 'Calibres cable aluminio THWN',
+    norma: 'NTC 2050 Tabla 310-16',
+    desc: 'Capacidad amp. aluminio aislamiento 75°C',
+    color: 'var(--blu)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">🔌 Conductores de aluminio — Aislamiento THWN / XHHW</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Tabla 310-16 · RETIE Art. 14 · Temperatura ambiente 30°C · Ducto conduit</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--blu);font-weight:700">Calibre AWG/kcmil</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">60°C (A)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--pr);font-weight:700">75°C (A)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--mut);font-weight:600">Sección mm²</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['12 AWG','15','20','3.31'],
+                ['10 AWG','25','30','5.26'],
+                ['8 AWG','30','40','8.37'],
+                ['6 AWG','40','50','13.3'],
+                ['4 AWG','55','65','21.1'],
+                ['3 AWG','65','75','26.7'],
+                ['2 AWG','75','90','33.6'],
+                ['1 AWG','85','100','42.4'],
+                ['1/0 AWG','100','120','53.5'],
+                ['2/0 AWG','115','135','67.4'],
+                ['3/0 AWG','130','155','85.0'],
+                ['4/0 AWG','150','180','107'],
+                ['250 kcmil','170','205','127'],
+                ['300 kcmil','190','230','152'],
+                ['350 kcmil','210','250','177'],
+                ['400 kcmil','225','270','203'],
+                ['500 kcmil','260','310','253'],
+                ['600 kcmil','285','340','304'],
+                ['750 kcmil','320','385','380'],
+                ['1000 kcmil','375','445','507'],
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:6px 8px;color:var(--blu);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:12px">${r[0]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--grn);font-weight:600">${r[1]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--pr);font-weight:600">${r[2]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:9px">${r[3]}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(74,144,217,0.07);border:1px solid rgba(74,144,217,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
+        <b style="color:var(--blu)">Calibre mínimo aluminio:</b> #12 AWG (NTC 2050 Art. 310-5)<br>
+        <b style="color:var(--blu)">vs Cobre:</b> Aluminio requiere ~2 calibres más grueso para igual amperaje<br>
+        <b style="color:var(--acc)">Uso en Colombia:</b> Acometidas, alimentadores y circuitos de alta potencia<br>
+        <b style="color:var(--pr)">RETIE:</b> Prohibido usar aluminio en calibres menores a #8 AWG para instalaciones fijas
+      </div>`
+  },
+
+  // ── TABLA 6: Calibre de cable por HP motor 220 V ─────────────────────────
+  'cable-por-motor-220': {
+    nombre: 'Cable para motor · 3φ 220 V',
+    norma: 'NTC 2050 Art. 430 · RETIE Art. 18',
+    desc: 'Calibre de cable recomendado por HP a 220 V',
+    color: 'var(--pr)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">🔌 Selección de cable para motores trifásicos 220 V</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Art. 430-22 · Cable = 125% × I_nominal · Cobre THW 75°C · Conduit</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--pr);font-weight:700">Motor HP</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">I nominal</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--acc);font-weight:700">I diseño (×1.25)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--txt);font-weight:700">Cable cobre</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['1/2','2.5 A','3.1 A','#14 AWG'],
+                ['3/4','3.5 A','4.4 A','#14 AWG'],
+                ['1','4.6 A','5.8 A','#14 AWG'],
+                ['1.5','6.6 A','8.3 A','#14 AWG'],
+                ['2','7.5 A','9.4 A','#14 AWG'],
+                ['3','10.8 A','13.5 A','#14 AWG'],
+                ['5','17.5 A','21.9 A','#12 AWG'],
+                ['7.5','25.3 A','31.6 A','#10 AWG'],
+                ['10','32.2 A','40.3 A','#8 AWG'],
+                ['15','48.3 A','60.4 A','#6 AWG'],
+                ['20','62.1 A','77.6 A','#4 AWG'],
+                ['25','78.2 A','97.8 A','#3 AWG'],
+                ['30','92.0 A','115.0 A','#2 AWG'],
+                ['40','120.0 A','150.0 A','#1/0 AWG'],
+                ['50','150.0 A','187.5 A','#2/0 AWG'],
+                ['60','177.0 A','221.3 A','#3/0 AWG'],
+                ['75','221.0 A','276.3 A','#4/0 AWG'],
+                ['100','285.0 A','356.3 A','350 kcmil'],
+                ['125','359.0 A','448.8 A','500 kcmil'],
+                ['150','414.0 A','517.5 A','600 kcmil'],
+                ['200','552.0 A','690.0 A','2×350 kcmil'],
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:6px 8px;color:var(--pr);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[0]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--grn)">${r[1]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--acc)">${r[2]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--txt);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:12px">${r[3]}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(232,64,12,0.07);border:1px solid rgba(232,64,12,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
+        <b style="color:var(--pr)">NTC 2050 Art. 430-22:</b> El conductor de un motor debe tener capacidad ≥ 125% de la corriente nominal<br>
+        <b style="color:var(--pr)">RETIE Art. 18:</b> Obligatorio calcular y documentar el calibre del conductor del motor<br>
+        <b style="color:var(--acc)">Importante:</b> Verificar siempre caída de tensión ≤ 3% (recomendado) o ≤ 5% (máximo RETIE)
+      </div>`
+  },
+
+  // ── TABLA 7: Calibre de cable por HP motor 440 V ─────────────────────────
+  'cable-por-motor-440': {
+    nombre: 'Cable para motor · 3φ 440 V',
+    norma: 'NTC 2050 Art. 430 · RETIE Art. 18',
+    desc: 'Calibre de cable recomendado por HP a 440 V',
+    color: 'var(--pr)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">🔌 Selección de cable para motores trifásicos 440 V</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Art. 430-22 · Cable = 125% × I_nominal · Cobre THW 75°C · Conduit</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--pr);font-weight:700">Motor HP</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">I nominal</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--acc);font-weight:700">I diseño (×1.25)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--txt);font-weight:700">Cable cobre</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['1/2','1.3 A','1.6 A','#14 AWG'],
+                ['3/4','1.8 A','2.3 A','#14 AWG'],
+                ['1','2.3 A','2.9 A','#14 AWG'],
+                ['1.5','3.3 A','4.1 A','#14 AWG'],
+                ['2','3.8 A','4.8 A','#14 AWG'],
+                ['3','5.4 A','6.8 A','#14 AWG'],
+                ['5','8.8 A','11.0 A','#14 AWG'],
+                ['7.5','12.6 A','15.8 A','#14 AWG'],
+                ['10','16.1 A','20.1 A','#12 AWG'],
+                ['15','24.2 A','30.3 A','#10 AWG'],
+                ['20','31.0 A','38.8 A','#8 AWG'],
+                ['25','39.1 A','48.9 A','#8 AWG'],
+                ['30','46.0 A','57.5 A','#6 AWG'],
+                ['40','60.0 A','75.0 A','#4 AWG'],
+                ['50','75.0 A','93.8 A','#3 AWG'],
+                ['60','88.5 A','110.6 A','#1 AWG'],
+                ['75','110.5 A','138.1 A','#1/0 AWG'],
+                ['100','142.5 A','178.1 A','#3/0 AWG'],
+                ['125','179.5 A','224.4 A','#4/0 AWG'],
+                ['150','207.0 A','258.8 A','300 kcmil'],
+                ['200','276.0 A','345.0 A','400 kcmil'],
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:6px 8px;color:var(--pr);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[0]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--grn)">${r[1]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--acc)">${r[2]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--txt);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:12px">${r[3]}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(232,64,12,0.07);border:1px solid rgba(232,64,12,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
+        <b style="color:var(--pr)">Ventaja 440 V:</b> Cables significativamente más delgados vs 220 V → menor costo instalación<br>
+        <b style="color:var(--acc)">NTC 2050 Art. 430-22:</b> Conductor ≥ 125% de la corriente nominal del motor<br>
+        <b style="color:var(--pr)">RETIE Art. 18:</b> En instalaciones nuevas industriales se recomienda 440 V sobre 220 V
+      </div>`
+  },
+
+  // ── TABLA 8: Protecciones OCPD motores 220 V ─────────────────────────────
+  'protecciones-220': {
+    nombre: 'Protecciones OCPD · 3φ 220 V',
+    norma: 'NTC 2050 Tabla 430-152',
+    desc: 'Breaker y fusible para motores a 220 V',
+    color: 'var(--grn)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">🛡️ Protecciones para motores trifásicos 220 V</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Tabla 430-152 · RETIE Art. 18 · Breaker tipo motor (MPCB) o fusible de retardo</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--pr);font-weight:700">HP</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">I nom (A)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--acc);font-weight:700">Breaker (A)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--blu);font-weight:700">Fusible TD (A)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--mut);font-weight:600">Relé térmico</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['1/2','2.5','15','6','2.5–4 A'],
+                ['3/4','3.5','15','8','2.5–4 A'],
+                ['1','4.6','15','10','4–6 A'],
+                ['1.5','6.6','15','15','4–6 A'],
+                ['2','7.5','15','15','6–10 A'],
+                ['3','10.8','20','20','9–13 A'],
+                ['5','17.5','30','30','13–18 A'],
+                ['7.5','25.3','50','45','23–32 A'],
+                ['10','32.2','60','60','28–40 A'],
+                ['15','48.3','90','90','40–57 A'],
+                ['20','62.1','110','110','55–70 A'],
+                ['25','78.2','150','150','63–80 A'],
+                ['30','92.0','175','175','80–100 A'],
+                ['40','120.0','225','200','100–125 A'],
+                ['50','150.0','300','250','125–160 A'],
+                ['60','177.0','350','300','145–180 A'],
+                ['75','221.0','400','400','180–220 A'],
+                ['100','285.0','600','500','250–315 A'],
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:6px 8px;color:var(--pr);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[0]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--grn)">${r[1]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--acc);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:12px">${r[2]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--blu);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:12px">${r[3]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:9px">${r[4]}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(46,196,182,0.07);border:1px solid rgba(46,196,182,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
+        <b style="color:var(--grn)">NTC 2050 Art. 430-52:</b> OCPD máximo = 250% × I_nominal (breaker) ó 175% (fusible retardo)<br>
+        <b style="color:var(--grn)">Relé térmico:</b> Regulado al 100–115% de la I_nominal del motor<br>
+        <b style="color:var(--acc)">Guardamotor MPCB:</b> Combina breaker + protección térmica en un solo dispositivo (IEC 60947-4)<br>
+        <b style="color:var(--pr)">RETIE Art. 18:</b> Todo motor debe tener protección contra sobrecarga y cortocircuito
+      </div>`
+  },
+
+  // ── TABLA 9: Protecciones OCPD motores 440 V ─────────────────────────────
+  'protecciones-440': {
+    nombre: 'Protecciones OCPD · 3φ 440 V',
+    norma: 'NTC 2050 Tabla 430-152',
+    desc: 'Breaker y fusible para motores a 440 V',
+    color: 'var(--grn)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">🛡️ Protecciones para motores trifásicos 440 V</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Tabla 430-152 · RETIE Art. 18 · Breaker tipo motor (MPCB) o fusible de retardo</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--pr);font-weight:700">HP</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">I nom (A)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--acc);font-weight:700">Breaker (A)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--blu);font-weight:700">Fusible TD (A)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--mut);font-weight:600">Relé térmico</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['1/2','1.3','15','3','1–1.6 A'],
+                ['3/4','1.8','15','4','1.6–2.5 A'],
+                ['1','2.3','15','6','2–3.2 A'],
+                ['1.5','3.3','15','8','2.5–4 A'],
+                ['2','3.8','15','8','2.5–4 A'],
+                ['3','5.4','15','10','4–6 A'],
+                ['5','8.8','15','15','7–10 A'],
+                ['7.5','12.6','20','20','10–13 A'],
+                ['10','16.1','30','25','13–18 A'],
+                ['15','24.2','45','40','20–25 A'],
+                ['20','31.0','60','60','25–32 A'],
+                ['25','39.1','80','70','32–40 A'],
+                ['30','46.0','90','80','40–50 A'],
+                ['40','60.0','110','100','50–63 A'],
+                ['50','75.0','150','125','63–80 A'],
+                ['60','88.5','175','150','80–90 A'],
+                ['75','110.5','225','200','90–110 A'],
+                ['100','142.5','300','250','125–160 A'],
+                ['125','179.5','350','300','160–200 A'],
+                ['150','207.0','400','350','200–250 A'],
+                ['200','276.0','600','500','250–315 A'],
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:6px 8px;color:var(--pr);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[0]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--grn)">${r[1]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--acc);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:12px">${r[2]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--blu);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:12px">${r[3]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:9px">${r[4]}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(46,196,182,0.07);border:1px solid rgba(46,196,182,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
+        <b style="color:var(--grn)">NTC 2050 Art. 430-52:</b> OCPD máximo = 250% × I_nominal (breaker) ó 175% (fusible retardo)<br>
+        <b style="color:var(--grn)">Ventaja 440 V:</b> Protecciones de menor calibre → menor costo en tableros<br>
+        <b style="color:var(--acc)">Guardamotor MPCB:</b> Schneider GV2/GV3 · ABB MS · Siemens 3RV — ajuste en campo<br>
+        <b style="color:var(--pr)">RETIE Art. 18:</b> Documentar coordinación de protecciones en el proyecto eléctrico
+      </div>`
+  },
+
+  // ── TABLA 10: Factor corrección temperatura ───────────────────────────────
+  'factor-temperatura': {
+    nombre: 'Factor corrección temperatura',
+    norma: 'NTC 2050 Tabla 310-16',
+    desc: 'Reducción de amperaje por temperatura ambiente',
+    color: 'var(--acc)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">🌡️ Factores de corrección por temperatura ambiente</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Tabla 310-16 · Base: 30°C · Multiplicar la capacidad de conducción por el factor</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--acc);font-weight:700">Temp. amb. (°C)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">Factor 60°C</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--pr);font-weight:700">Factor 75°C</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--blu);font-weight:700">Factor 90°C</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['10','1.22','1.15','1.10'],
+                ['15','1.17','1.12','1.08'],
+                ['20','1.13','1.09','1.05'],
+                ['25','1.07','1.04','1.03'],
+                ['30','1.00','1.00','1.00'],
+                ['35','0.94','0.96','0.97'],
+                ['40','0.88','0.91','0.93'],
+                ['45','0.82','0.87','0.90'],
+                ['50','0.75','0.82','0.86'],
+                ['55','0.67','0.76','0.82'],
+                ['60','0.58','0.71','0.77'],
+                ['65','0.47','0.65','0.73'],
+                ['70','0.35','0.58','0.68'],
+                ['75','—','0.50','0.63'],
+                ['80','—','0.41','0.58'],
+                ['85','—','—','0.52'],
+                ['90','—','—','0.45'],
+              ].map((r,i)=>{
+                const temp = parseInt(r[0]);
+                const isHot = temp > 30;
+                return `<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                  <td style="padding:6px 8px;color:${isHot?'var(--pr)':'var(--grn)'};font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[0]}°C</td>
+                  <td style="padding:6px 8px;text-align:center;color:${parseFloat(r[1])<1?'var(--pr)':'var(--grn)'};font-weight:600">${r[1]}</td>
+                  <td style="padding:6px 8px;text-align:center;color:${parseFloat(r[2])<1?'var(--pr)':'var(--grn)'};font-weight:600">${r[2]}</td>
+                  <td style="padding:6px 8px;text-align:center;color:${parseFloat(r[3])<1?'var(--pr)':'var(--grn)'};font-weight:600">${r[3]}</td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(255,183,3,0.07);border:1px solid rgba(255,183,3,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
+        <b style="color:var(--acc)">Ejemplo:</b> Cable #10 AWG Cu 75°C = 35 A a 30°C. A 45°C → 35 × 0.87 = <b style="color:var(--pr)">30.5 A</b><br>
+        <b style="color:var(--acc)">Colombia:</b> En zonas cálidas (Caribe, Orinoquía) usar temperatura ≥ 40°C para el diseño<br>
+        <b style="color:var(--grn)">NTC 2050:</b> Aplicar factor antes de seleccionar el calibre del conductor
+      </div>`
+  },
+
+  // ── TABLA 11: Factor agrupamiento conductores ─────────────────────────────
+  'factor-agrupamiento': {
+    nombre: 'Factor agrupamiento conductores',
+    norma: 'NTC 2050 Tabla 310-15(b)(2)(a)',
+    desc: 'Reducción por más de 3 conductores en ducto',
+    color: 'var(--acc)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">📦 Factores de ajuste por agrupamiento de conductores</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Tabla 310-15(b)(2)(a) · Aplicar cuando hay más de 3 conductores cargados en un mismo ducto o bandeja</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--acc);font-weight:700">N° conductores cargados</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--pr);font-weight:700">Factor de ajuste</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">% capacidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['1 – 3','1.00','100%','var(--grn)'],
+                ['4 – 6','0.80','80%','var(--acc)'],
+                ['7 – 9','0.70','70%','var(--acc)'],
+                ['10 – 20','0.50','50%','var(--pr)'],
+                ['21 – 30','0.45','45%','var(--pr)'],
+                ['31 – 40','0.40','40%','var(--pr)'],
+                ['Más de 40','0.35','35%','var(--pr)'],
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:6px 8px;color:var(--acc);font-weight:600">${r[0]}</td>
+                <td style="padding:6px 8px;text-align:center;color:${r[3]};font-weight:700;font-family:'Rajdhani',sans-serif;font-size:15px">${r[1]}</td>
+                <td style="padding:6px 8px;text-align:center;color:${r[3]};font-weight:600">${r[2]}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(255,183,3,0.07);border:1px solid rgba(255,183,3,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
+        <b style="color:var(--acc)">Ejemplo:</b> Tablero MCC con 8 circuitos de motor en un ducto → Factor 0.70<br>
+        Si el cable soporta 35 A → capacidad real = 35 × 0.70 = <b style="color:var(--pr)">24.5 A</b><br>
+        <b style="color:var(--acc)">Nota:</b> Los neutros de circuitos no lineales SÍ cuentan como conductores cargados<br>
+        <b style="color:var(--grn)">NTC 2050 Art. 310-15:</b> Aplica tanto a conduit como a bandejas portacables
+      </div>`
+  },
+
+  // ── TABLA 12: Capacidad de conduit ───────────────────────────────────────
+  'conduit': {
+    nombre: 'Capacidad de tuberías conduit',
+    norma: 'NTC 2050 Tabla C1 · Anexo C',
+    desc: 'Número máximo de conductores por conduit EMT/IMC/RGC',
+    color: 'var(--blu)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">🔧 Número máximo de conductores THW/THWN en conduit</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Tabla C1 · RETIE Art. 14 · Llenado máximo 40% área sección transversal (3+ conductores)</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--blu);font-weight:700">Calibre</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--txt);font-weight:600">½"</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--txt);font-weight:600">¾"</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--txt);font-weight:600">1"</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--txt);font-weight:600">1¼"</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--txt);font-weight:600">1½"</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--txt);font-weight:600">2"</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['#14 AWG','9','15','25','43','58','96'],
+                ['#12 AWG','7','12','20','35','47','78'],
+                ['#10 AWG','5','9','15','26','36','60'],
+                ['#8 AWG','2','5','8','14','19','32'],
+                ['#6 AWG','1','3','5','10','13','22'],
+                ['#4 AWG','1','2','4','7','9','15'],
+                ['#3 AWG','1','1','3','6','8','13'],
+                ['#2 AWG','1','1','3','5','7','11'],
+                ['#1 AWG','1','1','2','4','5','9'],
+                ['#1/0 AWG','—','1','1','3','4','7'],
+                ['#2/0 AWG','—','1','1','2','3','6'],
+                ['#3/0 AWG','—','1','1','2','3','5'],
+                ['#4/0 AWG','—','—','1','1','2','4'],
+                ['250 kcmil','—','—','1','1','1','3'],
+                ['300 kcmil','—','—','1','1','1','3'],
+                ['350 kcmil','—','—','—','1','1','2'],
+                ['500 kcmil','—','—','—','1','1','1'],
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:6px 8px;color:var(--blu);font-weight:700;font-size:11px">${r[0]}</td>
+                ${r.slice(1).map(v=>`<td style="padding:6px 8px;text-align:center;color:${v==='—'?'rgba(143,163,180,0.3)':parseInt(v)>=3?'var(--grn)':parseInt(v)===1?'var(--pr)':'var(--acc)'};font-weight:${v!=='—'?'700':'400'}">${v}</td>`).join('')}
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(74,144,217,0.07);border:1px solid rgba(74,144,217,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
+        <b style="color:var(--blu)">Regla de llenado NTC 2050:</b> 1 conductor = 53% · 2 conductores = 31% · 3+ conductores = 40%<br>
+        <b style="color:var(--blu)">EMT:</b> Uso interior, zonas secas · <b style="color:var(--blu)">IMC/RGC:</b> Uso exterior, zonas húmedas o con protección mecánica<br>
+        <b style="color:var(--acc)">RETIE Art. 14:</b> En Colombia se usa pulgadas para conduit — norma ANSI/UL
+      </div>`
+  },
+
+  // ── TABLA 13: Transformadores corrientes nominales ────────────────────────
+  'transformadores-corriente': {
+    nombre: 'Corrientes nominales transformadores',
+    norma: 'NTC 2050 Art. 450 · IEC 60076',
+    desc: 'Corriente primaria y secundaria por kVA',
+    color: 'var(--pr)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">🔄 Corrientes nominales de transformadores trifásicos</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Art. 450 · IEC 60076 · Tensiones red Colombia: 13.2 kV / 11.4 kV primario · 220 V / 440 V secundario</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--pr);font-weight:700">kVA</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--mut);font-weight:600">I prim. 13.2kV</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">I sec. 220V</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--acc);font-weight:700">I sec. 440V</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['15','0.66','39.4','19.7'],
+                ['25','1.09','65.6','32.8'],
+                ['37.5','1.64','98.4','49.2'],
+                ['45','1.97','118','59.1'],
+                ['50','2.19','131','65.6'],
+                ['75','3.28','197','98.4'],
+                ['100','4.37','262','131'],
+                ['112.5','4.92','295','148'],
+                ['150','6.56','394','197'],
+                ['167','7.30','438','219'],
+                ['200','8.75','525','262'],
+                ['225','9.84','591','295'],
+                ['250','10.94','656','328'],
+                ['300','13.12','787','394'],
+                ['333','14.57','874','437'],
+                ['400','17.49','1050','525'],
+                ['500','21.87','1312','656'],
+                ['630','27.56','1653','827'],
+                ['750','32.81','1969','984'],
+                ['1000','43.74','2625','1312'],
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:6px 8px;color:var(--pr);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[0]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:9px">${r[1]} A</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--grn);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:12px">${r[2]} A</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--acc);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:12px">${r[3]} A</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(232,64,12,0.07);border:1px solid rgba(232,64,12,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
+        <b style="color:var(--pr)">Fórmula:</b> I = kVA × 1000 ÷ (√3 × V)<br>
+        <b style="color:var(--acc)">NTC 2050 Art. 450-3:</b> Protección primario ≤ 125% × I_nominal · Secundario ≤ 125% × I_nominal<br>
+        <b style="color:var(--grn)">Colombia:</b> Red de distribución típica 13.2 kV (CODENSA, EPM, EMCALI, ESSA, etc.)
+      </div>`
+  },
+
+  // ── TABLA 14: Protecciones transformadores ────────────────────────────────
+  'protecciones-trafo': {
+    nombre: 'Protecciones transformadores',
+    norma: 'NTC 2050 Tabla 450-3(b)',
+    desc: 'OCPD primario y secundario por kVA',
+    color: 'var(--grn)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">🛡️ Protecciones para transformadores trifásicos secos</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Tabla 450-3(b) · Transformadores secos hasta 1000 V secundario · Red Colombia 220/440 V</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--pr);font-weight:700">kVA</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">I sec. 220V</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--acc);font-weight:700">OCPD sec. 220V</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">I sec. 440V</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--acc);font-weight:700">OCPD sec. 440V</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['15','39','50','20','25'],
+                ['25','66','80','33','40'],
+                ['37.5','98','125','49','60'],
+                ['45','118','150','59','70'],
+                ['50','131','175','66','80'],
+                ['75','197','250','98','125'],
+                ['100','262','325','131','175'],
+                ['112.5','295','375','148','175'],
+                ['150','394','500','197','250'],
+                ['167','438','550','219','275'],
+                ['200','525','650','262','325'],
+                ['225','591','750','296','375'],
+                ['250','656','800','328','400'],
+                ['300','787','1000','394','500'],
+                ['400','1050','1200','525','650'],
+                ['500','1312','1600','656','800'],
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:6px 8px;color:var(--pr);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[0]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--grn);font-size:9px">${r[1]} A</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--acc);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:12px">${r[2]} A</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--grn);font-size:9px">${r[3]} A</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--acc);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:12px">${r[4]} A</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(46,196,182,0.07);border:1px solid rgba(46,196,182,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
+        <b style="color:var(--grn)">NTC 2050 Tabla 450-3(b):</b> Con protección en secundario → OCPD primario no requerido si ≤ 167% I_prim<br>
+        <b style="color:var(--acc)">Sin protección en secundario:</b> OCPD primario ≤ 125% × I_nominal primario<br>
+        <b style="color:var(--pr)">RETIE:</b> Transformadores &gt; 112.5 kVA requieren protección diferencial (87T) según capacidad
+      </div>`
+  },
+
+  // ── TABLA 15: Conductor de puesta a tierra ────────────────────────────────
+  'tierra-conductor': {
+    nombre: 'Conductor de puesta a tierra',
+    norma: 'NTC 2050 Tabla 250-122',
+    desc: 'Calibre del conductor de tierra por protección',
+    color: 'var(--grn)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">🌍 Calibre del conductor de puesta a tierra por equipo</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Tabla 250-122 · RETIE Art. 15 · Conductor de cobre — EGC (Equipment Grounding Conductor)</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--grn);font-weight:700">Protección OCPD (A)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--acc);font-weight:700">EGC Cobre (AWG)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--blu);font-weight:700">EGC Aluminio (AWG)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--mut);font-weight:600">Sección mm²</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['15','#14','#12','2.08'],
+                ['20','#12','#10','3.31'],
+                ['30','#10','#8','5.26'],
+                ['40','#10','#8','5.26'],
+                ['60','#10','#8','5.26'],
+                ['100','#8','#6','8.37'],
+                ['200','#6','#4','13.3'],
+                ['300','#4','#2','21.1'],
+                ['400','#3','#1','26.7'],
+                ['500','#2','#1/0','33.6'],
+                ['600','#1','#2/0','42.4'],
+                ['800','#1/0','#3/0','53.5'],
+                ['1000','#2/0','#4/0','67.4'],
+                ['1200','#3/0','#250 kcmil','85.0'],
+                ['1600','#4/0','#350 kcmil','107'],
+                ['2000','#250 kcmil','#400 kcmil','127'],
+                ['2500','#350 kcmil','#600 kcmil','177'],
+                ['3000','#400 kcmil','#600 kcmil','203'],
+                ['4000','#500 kcmil','#750 kcmil','253'],
+                ['5000','#700 kcmil','#1200 kcmil','355'],
+                ['6000','#800 kcmil','#1200 kcmil','405'],
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:6px 8px;color:var(--grn);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[0]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--acc);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:11px">${r[1]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--blu);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:11px">${r[2]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:9px">${r[3]}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(46,196,182,0.07);border:1px solid rgba(46,196,182,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
+        <b style="color:var(--grn)">NTC 2050 Art. 250-122:</b> El EGC se selecciona según la protección (breaker/fusible) del circuito<br>
+        <b style="color:var(--grn)">RETIE Art. 15:</b> Resistencia de la puesta a tierra ≤ 5 Ω (general) · ≤ 1 Ω (datos/hospitalario)<br>
+        <b style="color:var(--acc)">Color verde:</b> El conductor de tierra siempre debe ser verde o verde con franja amarilla (RETIE)<br>
+        <b style="color:var(--pr)">Mínimo:</b> El EGC nunca puede ser menor que el conductor de fase más pequeño del circuito
+      </div>`
+  },
+
+  // ── TABLA 16: Resistividad de suelos Colombia ─────────────────────────────
+  'resistividad-suelos': {
+    nombre: 'Resistividad de suelos Colombia',
+    norma: 'RETIE Art. 15 · IEEE 80',
+    desc: 'Valores típicos ρ por tipo de suelo en Colombia',
+    color: 'var(--grn)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">🌍 Resistividad aparente de suelos — Valores típicos Colombia</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">RETIE Art. 15 · IEEE Std 80 · IEEE Std 142 · Medición con método Wenner (4 electrodos)</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--grn);font-weight:700">Tipo de suelo</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--acc);font-weight:700">ρ mín (Ω·m)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--pr);font-weight:700">ρ máx (Ω·m)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--mut);font-weight:600">Zona típica CO</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['Pantanos / humedales','1','30','Magdalena, Cauca bajo'],
+                ['Arcilla húmeda','2','100','Sabana Bogotá, valles'],
+                ['Tierra de cultivo húmeda','50','200','Antioquia, Eje Cafetero'],
+                ['Arcilla seca','100','400','Cundinamarca'],
+                ['Tierra arenosa húmeda','100','600','Costa Caribe húmeda'],
+                ['Arena suelta seca','200','2500','Guajira, Llanos secos'],
+                ['Grava y pedregosos','500','3000','Zonas montañosas'],
+                ['Roca blanda','1000','10000','Cordilleras'],
+                ['Roca dura (granito)','10000','100000','Macizos rocosos'],
+                ['Concreto húmedo','100','200','Pisos industriales'],
+                ['Concreto seco','1000','10000','Pisos secos'],
+              ].map((r,i)=>{
+                const rho = parseInt(r[2]);
+                const color = rho<200?'var(--grn)':rho<1000?'var(--acc)':'var(--pr)';
+                return `<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                  <td style="padding:6px 8px;color:var(--txt);font-size:10px">${r[0]}</td>
+                  <td style="padding:6px 8px;text-align:center;color:var(--grn);font-weight:600">${r[1]}</td>
+                  <td style="padding:6px 8px;text-align:center;color:${color};font-weight:700;font-family:'Rajdhani',sans-serif;font-size:12px">${r[2]}</td>
+                  <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:9px">${r[3]}</td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(46,196,182,0.07);border:1px solid rgba(46,196,182,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
+        <b style="color:var(--grn)">Fórmula electrodo vertical:</b> R = (ρ / 2πL) × [ln(4L/d) - 1] &nbsp;·&nbsp; L = longitud · d = diámetro<br>
+        <b style="color:var(--grn)">RETIE Art. 15.7:</b> Medir resistividad in situ con telurómetro antes de diseñar la malla<br>
+        <b style="color:var(--acc)">Mejoradores:</b> Bentonita, GEM, sales de roca → reducen ρ efectiva hasta 10× en suelos secos<br>
+        <b style="color:var(--pr)">Meta RETIE:</b> Sistema de puesta a tierra ≤ 5 Ω · Ambientes especiales ≤ 1 Ω
+      </div>`
+  },
+
+  // ── TABLA 17: Niveles de iluminancia RETILAP ──────────────────────────────
+  'iluminancia-retilap': {
+    nombre: 'Niveles iluminancia por local',
+    norma: 'RETILAP Tabla 410 · NTC 2050 Art. 410',
+    desc: 'Luxes mínimos por tipo de área o local',
+    color: 'var(--acc)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">💡 Niveles de iluminancia mínimos por tipo de local</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">RETILAP Res. 180540/2010 Tabla 410 · Norma ICONTEC · Medición en plano de trabajo a 0.80 m del piso</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--acc);font-weight:700">Tipo de local / tarea</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">E mín (lux)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--txt);font-weight:700">E recomen. (lux)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['Áreas de tránsito exterior','20','50','var(--mut)'],
+                ['Parqueaderos cubiertos','50','100','var(--mut)'],
+                ['Pasillos y circulaciones','100','150','var(--grn)'],
+                ['Bodegas y almacenes','100','200','var(--grn)'],
+                ['Salas de espera','200','300','var(--grn)'],
+                ['Oficinas generales','300','500','var(--acc)'],
+                ['Salas de reunión','300','500','var(--acc)'],
+                ['Área de lectura y escritura','500','750','var(--acc)'],
+                ['Salas de dibujo técnico','750','1000','var(--acc)'],
+                ['Talleres mecánicos gruesos','200','300','var(--grn)'],
+                ['Talleres mecánicos finos','500','750','var(--acc)'],
+                ['Soldadura y corte','300','500','var(--acc)'],
+                ['Plantas de ensamble finas','750','1000','var(--acc)'],
+                ['Control de calidad visual','1000','2000','var(--pr)'],
+                ['Salas de operación','500','1000','var(--pr)'],
+                ['Laboratorios','500','750','var(--acc)'],
+                ['Aulas de clase','300','500','var(--acc)'],
+                ['Cocinas industriales','300','500','var(--acc)'],
+                ['Cuartos técnicos / subestaciones','200','300','var(--grn)'],
+                ['Plantas de proceso continuo','300','500','var(--acc)'],
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:6px 8px;color:var(--txt);font-size:10px">${r[0]}</td>
+                <td style="padding:6px 8px;text-align:center;color:${r[3]};font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[1]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:10px">${r[2]}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(255,183,3,0.07);border:1px solid rgba(255,183,3,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
+        <b style="color:var(--acc)">RETILAP:</b> Obligatorio en Colombia · Resolución 180540 de 2010 (Min. de Minas y Energía)<br>
+        <b style="color:var(--acc)">Uniformidad:</b> Relación E_mín / E_media ≥ 0.80 en el plano de trabajo<br>
+        <b style="color:var(--grn)">IRC mínimo:</b> Zonas de trabajo ≥ 80 · Zonas de tránsito ≥ 40 (Índice Reproducción Cromática)<br>
+        <b style="color:var(--pr)">Eficiencia:</b> RETILAP exige eficacia mínima de luminarias — lm/W según tipo de fuente
+      </div>`
+  },
+
+  // ── TABLA 18: Eficiencia mínima luminarias RETILAP ────────────────────────
+  'eficiencia-luminarias': {
+    nombre: 'Eficiencia mínima luminarias',
+    norma: 'RETILAP · Res. 180540/2010',
+    desc: 'Eficacia mínima lm/W por tecnología de lámpara',
+    color: 'var(--acc)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">💡 Eficacia mínima de fuentes lumínicas — RETILAP Colombia</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">RETILAP Resolución 180540/2010 · Min. Minas y Energía Colombia · Obligatorio para equipos nuevos</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--acc);font-weight:700">Tecnología</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">Eficacia mín. (lm/W)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--txt);font-weight:600">Eficacia típica actual</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--mut);font-weight:600">Vida útil (h)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['LED industrial (highbay)','80','120–200','50.000–100.000','var(--grn)'],
+                ['LED panel/troffer','80','100–160','30.000–50.000','var(--grn)'],
+                ['LED calle/exterior','80','110–170','50.000–100.000','var(--grn)'],
+                ['Fluorescente T8 electrónico','75','80–100','15.000–20.000','var(--acc)'],
+                ['Fluorescente T5 electrónico','80','90–110','16.000–24.000','var(--acc)'],
+                ['Ahorrador CFL compacta','55','50–75','8.000–15.000','var(--acc)'],
+                ['Mercurio de alta presión (HQL)','40','35–60','10.000–24.000','var(--pr)'],
+                ['Sodio alta presión (HPS)','70','80–130','16.000–32.000','var(--acc)'],
+                ['Sodio baja presión (LPS)','100','100–200','14.000–18.000','var(--grn)'],
+                ['Metal halide cerámico (CDM)','75','75–110','10.000–20.000','var(--acc)'],
+                ['Halógena incandescente','10','12–25','2.000–4.000','var(--pr)'],
+                ['Incandescente estándar','—','8–15','750–1.000','var(--pr)'],
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:6px 8px;color:var(--txt);font-size:10px">${r[0]}</td>
+                <td style="padding:6px 8px;text-align:center;color:${r[4]};font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[1]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:9px">${r[2]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:9px">${r[3]}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(255,183,3,0.07);border:1px solid rgba(255,183,3,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
+        <b style="color:var(--acc)">RETILAP:</b> Prohíbe instalar fuentes por debajo de la eficacia mínima en proyectos nuevos<br>
+        <b style="color:var(--grn)">LED recomendado:</b> Mayor eficacia + vida útil larga = menor costo total de propiedad (TCO)<br>
+        <b style="color:var(--pr)">Incandescente:</b> Prohibida su comercialización en Colombia desde 2014 (Res. 181419/2010)
+      </div>`
+  },
+
+  // ── TABLA 19: Factores de demanda NTC 2050 ───────────────────────────────
+  'factores-demanda': {
+    nombre: 'Factores de demanda cargas',
+    norma: 'NTC 2050 Art. 220',
+    desc: 'Factor de demanda por tipo y número de cargas',
+    color: 'var(--blu)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">📐 Factores de demanda por tipo de carga</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Art. 220 · RETIE · Aplica para dimensionar alimentadores y acometidas</div>
+
+        <div style="font-size:10px;color:var(--acc);font-weight:700;margin:6px 0 4px">Iluminación — Edificios comerciales (Art. 220-11)</div>
+        <div style="overflow-x:auto;margin-bottom:10px">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead><tr style="background:var(--mid)">
+              <th style="padding:6px 8px;text-align:left;color:var(--acc)">Porción de carga total (VA)</th>
+              <th style="padding:6px 8px;text-align:center;color:var(--grn)">Factor demanda</th>
+            </tr></thead>
+            <tbody>
+              ${[['Primeros 12 500 VA','100%'],['De 12 500 a 250 000 VA','35%'],['Más de 250 000 VA','25%']
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:5px 8px;color:var(--txt);font-size:10px">${r[0]}</td>
+                <td style="padding:5px 8px;text-align:center;color:var(--grn);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[1]}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <div style="font-size:10px;color:var(--acc);font-weight:700;margin:6px 0 4px">Motores — Cargas combinadas (Art. 430-24)</div>
+        <div style="overflow-x:auto;margin-bottom:10px">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead><tr style="background:var(--mid)">
+              <th style="padding:6px 8px;text-align:left;color:var(--acc)">Condición</th>
+              <th style="padding:6px 8px;text-align:center;color:var(--grn)">Factor</th>
+            </tr></thead>
+            <tbody>
+              ${[
+                ['Motor más grande del grupo','125% I_nominal'],
+                ['Resto de motores','100% I_nominal'],
+                ['Motores que no operan simultáneamente','Mayor de ellos'],
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:5px 8px;color:var(--txt);font-size:10px">${r[0]}</td>
+                <td style="padding:5px 8px;text-align:center;color:var(--acc);font-weight:600;font-size:10px">${r[1]}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <div style="font-size:10px;color:var(--acc);font-weight:700;margin:6px 0 4px">Tomacorrientes — Edificios (Art. 220-13)</div>
+        <div style="overflow-x:auto;margin-bottom:10px">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead><tr style="background:var(--mid)">
+              <th style="padding:6px 8px;text-align:left;color:var(--acc)">Número de tomacorrientes</th>
+              <th style="padding:6px 8px;text-align:center;color:var(--grn)">Factor demanda</th>
+            </tr></thead>
+            <tbody>
+              ${[['1 – 10','100%'],['11 – 20','50%'],['Más de 20','25%']
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:5px 8px;color:var(--txt);font-size:10px">${r[0]}</td>
+                <td style="padding:5px 8px;text-align:center;color:var(--grn);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[1]}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <div style="font-size:10px;color:var(--acc);font-weight:700;margin:6px 0 4px">Cargas de cocina — Unidades residenciales (Art. 220-20)</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead><tr style="background:var(--mid)">
+              <th style="padding:6px 8px;text-align:left;color:var(--acc)">N° unidades de cocina</th>
+              <th style="padding:6px 8px;text-align:center;color:var(--grn)">Factor demanda</th>
+            </tr></thead>
+            <tbody>
+              ${[['1','80%'],['2','75%'],['3','70%'],['4','66%'],['5','62%'],['6 – 10','56%'],['11 – 20','48%'],['21 – 30','44%'],['31 – 40','40%'],['41 – 50','36%'],['Más de 50','35%']
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:5px 8px;color:var(--txt);font-size:10px">${r[0]}</td>
+                <td style="padding:5px 8px;text-align:center;color:var(--grn);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[1]}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(74,144,217,0.07);border:1px solid rgba(74,144,217,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
+        <b style="color:var(--blu)">Uso:</b> Demanda = Carga instalada × Factor de demanda → dimensiona acometida y alimentador<br>
+        <b style="color:var(--acc)">RETIE:</b> El cálculo de demanda debe incluirse en el proyecto eléctrico (memoria de cálculo)<br>
+        <b style="color:var(--grn)">NTC 2050 Art. 220-3:</b> Carga mínima por circuito = 1500 VA para tomacorrientes de uso general
+      </div>`
+  },
+
+  // ── TABLA 20: Densidad de carga VA/m² ────────────────────────────────────
+  'densidad-carga': {
+    nombre: 'Densidad de carga VA/m²',
+    norma: 'NTC 2050 Art. 220 · RETIE',
+    desc: 'Cargas unitarias por tipo de edificación',
+    color: 'var(--blu)',
+    html: () => `
+      <div class="rb" style="margin-bottom:8px">
+        <div class="rbt">📐 Cargas unitarias mínimas por tipo de ocupación</div>
+        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Tabla 220-3(a) · Carga por unidad de área para dimensionar la acometida y alimentadores</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--mid)">
+                <th style="padding:7px 8px;text-align:left;color:var(--blu);font-weight:700">Tipo de edificación / uso</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--acc);font-weight:700">VA/m²</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">W/m² aprox.</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                ['Armadurías y accesorios','30','30','var(--grn)'],
+                ['Auditorios','11','11','var(--grn)'],
+                ['Bancos','39','39','var(--acc)'],
+                ['Barberías / salones de belleza','33','33','var(--acc)'],
+                ['Edificios de oficinas','39','39','var(--acc)'],
+                ['Garajes — reparación y almacenaje','5','5','var(--grn)'],
+                ['Hospitales','22','22','var(--acc)'],
+                ['Hoteles y moteles','22','22','var(--acc)'],
+                ['Industria y manufactura','22','22','var(--acc)'],
+                ['Joyerías y almacenes finos','33','33','var(--acc)'],
+                ['Lavanderías comerciales','44','44','var(--acc)'],
+                ['Almacenes de víveres','33','33','var(--acc)'],
+                ['Restaurantes','22','22','var(--acc)'],
+                ['Residencias unifamiliares','33','33','var(--acc)'],
+                ['Residencias multifamiliares','33','33','var(--acc)'],
+                ['Almacenes de ropa','33','33','var(--acc)'],
+                ['Escuelas','33','33','var(--acc)'],
+                ['Bodegas — almacenamiento','5','5','var(--grn)'],
+                ['Centros comerciales','33','33','var(--acc)'],
+                ['Plantas de proceso industrial','44','44','var(--pr)'],
+              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
+                <td style="padding:6px 8px;color:var(--txt);font-size:10px">${r[0]}</td>
+                <td style="padding:6px 8px;text-align:center;color:${r[3]};font-weight:700;font-family:'Rajdhani',sans-serif;font-size:14px">${r[1]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:10px">${r[2]}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:rgba(74,144,217,0.07);border:1px solid rgba(74,144,217,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
+        <b style="color:var(--blu)">Uso:</b> Carga total = Área (m²) × VA/m² → punto de partida para el diseño de la acometida<br>
+        <b style="color:var(--blu)">Luego aplicar:</b> Factor de demanda (Tabla anterior) para obtener la demanda real<br>
+        <b style="color:var(--acc)">NTC 2050 Art. 220-3:</b> La carga calculada no puede ser menor que la carga unitaria mínima<br>
+        <b style="color:var(--pr)">RETIE:</b> Memoria de cálculo obligatoria en proyectos eléctricos presentados ante SSPD
+      </div>`
+  },
+
+};
+
+function renderTablasMenu(){
+  const ids = Object.keys(TABLAS_DATA);
+  const menu = document.getElementById('tablas-menu');
+  if(!ids.length){
+    menu.innerHTML = `<div style="margin:32px 0;text-align:center;color:var(--mut);font-size:11px;line-height:1.8">
+      <div style="font-size:28px;margin-bottom:10px">📋</div>
+      <div>Las tablas de referencia se agregarán próximamente.</div>
+      <div style="font-size:9px;margin-top:6px;color:rgba(143,163,180,0.5)">NTC 2050 · RETIE · IEC</div>
+    </div>`;
+    return;
+  }
+  menu.innerHTML = ids.map(id=>{
+    const t = TABLAS_DATA[id];
+    return `<div class="pi" onclick="abrirTabla('${id}')">
+      <div class="pd" style="background:${t.color||'var(--grn)'}"></div>
+      <div style="flex:1">
+        <div class="pin">${t.nombre}</div>
+        <div class="pis">${t.norma} · ${t.desc}</div>
+      </div>
+      <div class="parr">›</div>
+    </div>`;
+  }).join('');
+}
+
+function abrirTabla(id){
+  const t = TABLAS_DATA[id];
+  if(!t) return;
+  document.getElementById('tabla-detalle-titulo').textContent = t.nombre;
+  document.getElementById('tabla-detalle-norma').textContent = t.norma;
+  document.getElementById('tabla-detalle-body').innerHTML = t.html();
+  go('s-tabla-detalle');
+}
+
+// Inicializar menú de tablas al cargar
+document.addEventListener('DOMContentLoaded', renderTablasMenu);
 
 // ── Service Worker ─────────────────────────────────────────────────────────────
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
