@@ -152,6 +152,7 @@ select.inp{appearance:none}
     <div class="cc feat" onclick="go('s-conexion');setTimeout(initConexion,50)"><div class="ci ic-b">🔌</div><div class="cn">Conexión de Motores</div><div class="cd">Triángulo, estrella, inversión</div><div class="cnorm">NTC 2050 · IEC</div></div>
     <div class="cc feat" onclick="go('s-energia')" style="grid-column:1/-1"><div class="ci ic-y">⚡</div><div class="cn">Consumo Energético</div><div class="cd">kWh, costo en pesos, análisis por motor</div><div class="cnorm">UPME · XM · Tarifa CU</div></div>
     <div class="cc feat" onclick="go('s-tablas')" style="grid-column:1/-1"><div class="ci ic-g">📋</div><div class="cn">Tablas de Referencia</div><div class="cd">Conductores, protecciones, calibres, NTC 2050</div><div class="cnorm">NTC 2050 · RETIE</div></div>
+    <div class="cc feat" onclick="go('s-totalizador')" style="grid-column:1/-1"><div class="ci ic-r">🔒</div><div class="cn">Selección de Interruptor General</div><div class="cd">Breaker principal, calibre conductor, tipo de interruptor</div><div class="cnorm">NTC 2050 · RETIE Art.16</div></div>
   </div>
 
   <div class="sl">Próximamente</div>
@@ -189,7 +190,7 @@ select.inp{appearance:none}
         <div>
           <div class="il">Tensión (V) <span>*</span></div>
           <select class="inp" id="en-tension" style="width:100%">
-            <option value="440" selected>440 V — Trifásico Colombia</option>
+            <option value="440" selected>440 V — Trifásico</option>
             <option value="220">220 V — Trifásico / Monofásico</option>
             <option value="110">110 V — Monofásico</option>
           </select>
@@ -830,6 +831,255 @@ select.inp{appearance:none}
 </div>
 
 <!-- NAV -->
+<!-- ═══ TOTALIZADOR PRINCIPAL ═══ -->
+<div class="screen" id="s-totalizador">
+  <div class="hdr">
+    <div class="back" onclick="go('s-industrial')">←</div>
+    <div class="ht">Selección de Interruptor General</div>
+    <div class="hb">NTC 2050 · RETIE Art.16</div>
+  </div>
+
+  <div style="padding:0 14px 90px">
+
+    <div class="hband"><div class="hbi">🔒</div><div class="hbt"><b>Selección de Interruptor General</b><br>Breaker principal · Calibre conductor · NTC 2050</div></div>
+
+    <!-- TIPO DE SISTEMA -->
+    <div class="isec" style="margin-top:11px">
+      <div class="ist"><div class="dot-r"></div>Tipo de Sistema</div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button id="tot-bt-tri" class="tb on" onclick="totSetFase('tri')" style="flex:1;font-size:10px">Trifásico</button>
+        <button id="tot-bt-mono" class="tb" onclick="totSetFase('mono')" style="flex:1;font-size:10px">Monofásico</button>
+      </div>
+      <div style="margin-top:10px">
+        <div class="il">Tensión del sistema <span>*</span></div>
+        <select class="inp" id="tot-tension" style="width:100%;margin-top:4px" onchange="totUpdateTension()">
+          <option value="440">440 V — Trifásico</option>
+          <option value="220tri">220 V — Trifásico</option>
+          <option value="220mono">220 V — Monofásico</option>
+          <option value="110">110 V — Monofásico</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- CARGAS -->
+    <div class="isec" style="margin-top:10px">
+      <div class="ist"><div class="dot-r"></div>Cargas Instaladas</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <div>
+          <div class="il">Potencia total <span>*</span></div>
+          <input class="inp" id="tot-pot" type="number" inputmode="decimal" placeholder="ej: 75" min="0.1" step="0.1" style="width:100%;margin-top:4px" oninput="totConvertir()">
+        </div>
+        <div>
+          <div class="il">Unidad</div>
+          <select class="inp" id="tot-unidad" style="width:100%;margin-top:4px" onchange="totConvertir()">
+            <option value="kw">kW</option>
+            <option value="hp">HP</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Conversión en tiempo real -->
+      <div id="tot-conv-box" style="display:none;background:rgba(46,196,182,.07);border:1px solid rgba(46,196,182,.2);border-radius:8px;padding:8px 10px;margin-top:8px;font-size:9px;color:var(--grn)"></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <div>
+          <div class="il">Factor de demanda <span>*</span></div>
+          <input class="inp" id="tot-fd" type="number" inputmode="decimal" placeholder="0.80" min="0.1" max="1" step="0.01" value="0.80" style="width:100%;margin-top:4px">
+        </div>
+        <div>
+          <div class="il">Factor de potencia <span>*</span></div>
+          <input class="inp" id="tot-fp" type="number" inputmode="decimal" placeholder="0.85" min="0.1" max="1" step="0.01" value="0.85" style="width:100%;margin-top:4px">
+        </div>
+      </div>
+      <div class="pdesc">FD típico industrial: 0.70–0.85 · FP típico: 0.80–0.90 (NTC 2050 Art.220)</div>
+    </div>
+
+    <!-- CONDICIONES AMBIENTALES -->
+    <div class="isec" style="margin-top:10px">
+      <div class="ist"><div class="dot-g"></div>Condiciones de Instalación</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <div>
+          <div class="il">Temperatura ambiente (°C)</div>
+          <select class="inp" id="tot-temp" style="width:100%;margin-top:4px">
+            <option value="1.00">≤ 30 °C (factor 1.00)</option>
+            <option value="0.91" selected>31–35 °C (factor 0.91)</option>
+            <option value="0.82">36–40 °C (factor 0.82)</option>
+            <option value="0.71">41–45 °C (factor 0.71)</option>
+            <option value="0.58">46–50 °C (factor 0.58)</option>
+          </select>
+        </div>
+        <div>
+          <div class="il">Conductores agrupados</div>
+          <select class="inp" id="tot-agrup" style="width:100%;margin-top:4px">
+            <option value="1.00">1–3 conductores (1.00)</option>
+            <option value="0.80" selected>4–6 conductores (0.80)</option>
+            <option value="0.70">7–9 conductores (0.70)</option>
+            <option value="0.65">10–20 conductores (0.65)</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:8px">
+        <div class="il">Material del conductor</div>
+        <div style="display:flex;gap:6px;margin-top:4px">
+          <button id="tot-bt-cu" class="tb on" onclick="totSetMaterial('cu')" style="flex:1;font-size:10px">Cobre (Cu)</button>
+          <button id="tot-bt-al" class="tb" onclick="totSetMaterial('al')" style="flex:1;font-size:10px">Aluminio (Al)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTÓN CALCULAR -->
+    <button class="cbtn" style="margin-top:11px" onclick="calcTotalizador()">⚡ CALCULAR TOTALIZADOR</button>
+
+    <!-- RESULTADOS -->
+    <div id="tot-resultados" style="display:none;margin-top:12px">
+
+      <div style="background:rgba(232,64,12,.07);border:1px solid rgba(232,64,12,.3);border-radius:12px;padding:13px;margin-bottom:10px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--txt);margin-bottom:10px;display:flex;align-items:center;gap:6px">
+          <div style="width:6px;height:6px;border-radius:50%;background:var(--pr);flex-shrink:0"></div>
+          Corrientes de Diseño
+        </div>
+        <div class="rgrid">
+          <div class="rc">
+            <div class="rcl">I Demanda Total</div>
+            <div class="rcv r" id="tot-r-idem">—</div>
+            <div class="rcu">Amperios (A)</div>
+          </div>
+          <div class="rc hi">
+            <div class="rcl">I Diseño (×1.25)</div>
+            <div class="rcv r" id="tot-r-idis">—</div>
+            <div class="rcu">Amperios (A)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rb">
+        <div class="rbt">🔒 Totalizador Recomendado</div>
+        <div class="rr">
+          <div class="rrl">Capacidad del breaker</div>
+          <div class="rrv r" id="tot-r-breaker">—</div>
+        </div>
+        <div class="rr">
+          <div class="rrl">Tipo de interruptor</div>
+          <div class="rrv b" id="tot-r-tipo">—</div>
+        </div>
+        <div class="rr">
+          <div class="rrl">Norma aplicable</div>
+          <div class="rrv g" id="tot-r-norma">—</div>
+        </div>
+        <div class="rr">
+          <div class="rrl">Poder de corte mínimo</div>
+          <div class="rrv y" id="tot-r-icu">—</div>
+        </div>
+      </div>
+
+      <div class="rb">
+        <div class="rbt">🔌 Conductor Principal</div>
+        <div class="rr">
+          <div class="rrl">Calibre recomendado</div>
+          <div class="rrv r" id="tot-r-calibre">—</div>
+        </div>
+        <div class="rr">
+          <div class="rrl">Capacidad de conducción</div>
+          <div class="rrv g" id="tot-r-ampacidad">—</div>
+        </div>
+        <div class="rr">
+          <div class="rrl">Material</div>
+          <div class="rrv b" id="tot-r-material">—</div>
+        </div>
+        <div class="rr">
+          <div class="rrl">Tipo de aislamiento</div>
+          <div class="rrv y" id="tot-r-aislamiento">—</div>
+        </div>
+        <div class="rr">
+          <div class="rrl">Norma conductor</div>
+          <div class="rrv g">NTC 2050 Art.310</div>
+        </div>
+      </div>
+
+      <div class="rb">
+        <div class="rbt">📋 Resumen del Sistema</div>
+        <div class="rr">
+          <div class="rrl">Potencia total (kW)</div>
+          <div class="rrv" id="tot-r-pot">—</div>
+        </div>
+        <div class="rr">
+          <div class="rrl">Tensión del sistema</div>
+          <div class="rrv" id="tot-r-tension">—</div>
+        </div>
+        <div class="rr">
+          <div class="rrl">Factor de demanda</div>
+          <div class="rrv" id="tot-r-fd">—</div>
+        </div>
+        <div class="rr">
+          <div class="rrl">Factor de potencia</div>
+          <div class="rrv" id="tot-r-fp">—</div>
+        </div>
+        <div class="rr">
+          <div class="rrl">Tipo de sistema</div>
+          <div class="rrv" id="tot-r-sistema">—</div>
+        </div>
+      </div>
+
+      <div id="tot-advertencia" style="display:none" class="wbox"></div>
+
+      <!-- REFERENCIAS COMERCIALES COLOMBIA -->
+      <div class="rb" id="tot-refs-comerciales" style="margin-top:10px">
+        <div class="rbt">🏪 Referencias Comerciales Colombia</div>
+        <div style="font-size:8.5px;color:var(--mut);margin-bottom:8px">Marcas disponibles en distribuidores colombianos · Precios y disponibilidad sujetos a variación</div>
+        <div id="tot-refs-tabla" style="overflow-x:auto"></div>
+        <div style="margin-top:8px;padding:7px 9px;background:rgba(74,144,217,0.07);border-left:2px solid #4A90D9;border-radius:4px;font-size:8px;color:var(--mut);line-height:1.6">
+          <span style="color:#4A90D9;font-weight:600">ⓘ Nota:</span> Referencias orientativas. Verificar disponibilidad con <b style="color:var(--txt)">Schneider, ABB, Siemens, Legrand o Eaton</b> Colombia. Exigir certificación <b style="color:var(--grn)">IEC 60947-2</b> y ficha técnica.
+        </div>
+      </div>
+
+      <!-- DATOS DEL INFORME -->
+      <div class="isec" style="margin-top:10px">
+        <div class="ist"><div class="dot-g"></div>Datos del Informe <span style="font-size:9px;color:var(--mut);font-weight:400">(opcional)</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+          <div>
+            <div class="il">Empresa / Cliente</div>
+            <input class="inp" id="tot-empresa" type="text" placeholder="Nombre empresa (opcional)" style="width:100%;margin-top:4px">
+          </div>
+          <div>
+            <div class="il">Proyecto / Descripción</div>
+            <input class="inp" id="tot-proyecto" type="text" placeholder="ej: Tablero principal bodega (opcional)" style="width:100%;margin-top:4px">
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTONES PDF E HISTORIAL -->
+      <div style="display:flex;gap:8px;margin-top:11px;margin-bottom:8px">
+        <button onclick="totExportarPDF('guardar')" style="flex:1;padding:12px;background:transparent;border:1px solid rgba(46,196,182,.35);border-radius:10px;color:var(--grn);font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;cursor:pointer">
+          💾 Guardar PDF
+        </button>
+        <button onclick="totExportarPDF('compartir')" style="flex:1;padding:12px;background:transparent;border:1px solid rgba(74,144,217,.35);border-radius:10px;color:#4A90D9;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;cursor:pointer">
+          📤 Compartir PDF
+        </button>
+      </div>
+      <button onclick="totGuardarHistorial()" style="width:100%;margin-bottom:16px;padding:11px;background:transparent;border:1px solid rgba(74,144,217,.35);border-radius:10px;color:#4A90D9;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;cursor:pointer">
+        📋 Guardar en historial
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HISTORIAL TOTALIZADOR ═══ -->
+<div class="screen" id="s-historial-tot">
+  <div class="logo-band"><div class="logo" style="margin-left:10px">Historial<em> Totalizador</em></div></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px 0">
+    <span style="font-size:9px;color:var(--mut)" id="hist-tot-count">0 cálculos guardados</span>
+    <button onclick="borrarHistorialTot()" style="background:transparent;border:1px solid rgba(232,64,12,.35);border-radius:6px;color:var(--pr);font-size:9px;padding:4px 10px;cursor:pointer">🗑 Borrar todo</button>
+  </div>
+  <div id="hist-tot-list" style="padding:8px 16px 80px"></div>
+  <div id="hist-tot-empty" style="padding:40px 16px;text-align:center;color:var(--mut);font-size:11px">
+    <div style="font-size:32px;margin-bottom:10px">🔒</div>
+    <div>No hay cálculos guardados.</div>
+    <div style="margin-top:6px;font-size:9px">Usa "Guardar en historial"<br>desde Selección de Interruptor General.</div>
+  </div>
+</div>
+
 <div class="nav-bar">
   <div class="ni on" id="n-home" onclick="go('s-home')"><div class="nav-icon">🏠</div><div class="nav-lbl">Inicio</div></div>
 
@@ -1186,7 +1436,7 @@ function initConexion(){
 }
 
 // ── Navegación ────────────────────────────────────────────────────────────────
-const NM={'s-home':'n-home','s-industrial':'n-home','s-motores':'n-home','s-dol':'n-home','s-conexion':'n-home','s-energia':'n-home','s-historial-dol':'n-hist','s-historial-energia':'n-hist','s-normas':'n-norm','s-perfil':'n-perf','s-tablas':'n-home','s-tabla-detalle':'n-home'};
+const NM={'s-home':'n-home','s-industrial':'n-home','s-motores':'n-home','s-dol':'n-home','s-conexion':'n-home','s-energia':'n-home','s-historial-dol':'n-hist','s-historial-energia':'n-hist','s-historial-tot':'n-hist','s-normas':'n-norm','s-perfil':'n-perf','s-tablas':'n-home','s-tabla-detalle':'n-home','s-totalizador':'n-home'};
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
@@ -1657,6 +1907,7 @@ const MAX_HIST = 50;
 function showHistorialMenu(){
   const dolN  = cargarHistorialDOL().length;
   const enN   = cargarHistorialEnergia().length;
+  const totN  = cargarHistorialTot().length;
   // mini modal de selección
   const m = document.createElement('div');
   m.id = 'modal-hist-menu';
@@ -1665,7 +1916,8 @@ function showHistorialMenu(){
     <div style="font-size:22px;margin-bottom:8px">📋</div>
     <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:#F0EDE8;margin-bottom:16px">Ver Historial</div>
     <button onclick="document.getElementById('modal-hist-menu').remove();go('s-historial-dol');renderHistorialDOL()" style="width:100%;margin-bottom:10px;padding:12px;background:rgba(232,64,12,.1);border:1px solid rgba(232,64,12,.4);border-radius:10px;color:#E8400C;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;cursor:pointer">🔴 Arranque DOL <span style="opacity:.7;font-weight:400">(${dolN})</span></button>
-    <button onclick="document.getElementById('modal-hist-menu').remove();go('s-historial-energia');renderHistorialEnergia()" style="width:100%;margin-bottom:16px;padding:12px;background:rgba(74,144,217,.1);border:1px solid rgba(74,144,217,.4);border-radius:10px;color:#4A90D9;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;cursor:pointer">⚡ Consumo Energético <span style="opacity:.7;font-weight:400">(${enN})</span></button>
+    <button onclick="document.getElementById('modal-hist-menu').remove();go('s-historial-energia');renderHistorialEnergia()" style="width:100%;margin-bottom:10px;padding:12px;background:rgba(74,144,217,.1);border:1px solid rgba(74,144,217,.4);border-radius:10px;color:#4A90D9;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;cursor:pointer">⚡ Consumo Energético <span style="opacity:.7;font-weight:400">(${enN})</span></button>
+    <button onclick="document.getElementById('modal-hist-menu').remove();go('s-historial-tot');renderHistorialTot()" style="width:100%;margin-bottom:16px;padding:12px;background:rgba(232,64,12,.08);border:1px solid rgba(232,64,12,.3);border-radius:10px;color:#E8400C;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;cursor:pointer">🔒 Interruptor General <span style="opacity:.7;font-weight:400">(${totN})</span></button>
     <button onclick="document.getElementById('modal-hist-menu').remove()" style="width:100%;padding:9px;background:transparent;border:1px solid rgba(143,163,180,.3);border-radius:10px;color:#8FA3B4;font-family:'Space Grotesk',sans-serif;font-size:11px;cursor:pointer">Cancelar</button>
   </div>`;
   document.body.appendChild(m);
@@ -1786,6 +2038,9 @@ function modalConfirmarBorrar(si){
     if(tipo==='energia'){
       localStorage.removeItem(DB_KEY_EN);
       renderHistorialEnergia();
+    } else if(tipo==='tot'){
+      localStorage.removeItem(DB_KEY_TOT);
+      renderHistorialTot();
     } else {
       localStorage.removeItem(DB_KEY_DOL);
       renderHistorialDOL();
@@ -4765,6 +5020,669 @@ function abrirTabla(id){
 
 // Inicializar menú de tablas al cargar
 document.addEventListener('DOMContentLoaded', renderTablasMenu);
+
+// ── HISTORIAL TOTALIZADOR ────────────────────────────────────────────────────
+const DB_KEY_TOT = 'electrocol_hist_tot';
+
+function cargarHistorialTot() {
+  try { return JSON.parse(localStorage.getItem(DB_KEY_TOT)) || []; } catch(e) { return []; }
+}
+
+function totGuardarHistorial() {
+  const iDem = document.getElementById('tot-r-idem').textContent;
+  if (!iDem || iDem === '—') { showToast('⚠ Primero realiza el cálculo'); return; }
+  const historial = cargarHistorialTot();
+  const nuevo = {
+    id: Date.now(),
+    fecha: new Date().toLocaleDateString('es-CO'),
+    hora: new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
+    empresa: document.getElementById('tot-empresa').value || 'ElectroCol',
+    proyecto: document.getElementById('tot-proyecto').value || 'Interruptor General',
+    sistema: document.getElementById('tot-r-sistema').textContent,
+    tension: document.getElementById('tot-r-tension').textContent,
+    pot: document.getElementById('tot-r-pot').textContent,
+    fd: document.getElementById('tot-r-fd').textContent,
+    fp: document.getElementById('tot-r-fp').textContent,
+    iDemanda: iDem,
+    iDiseno: document.getElementById('tot-r-idis').textContent,
+    breaker: document.getElementById('tot-r-breaker').textContent,
+    tipo: document.getElementById('tot-r-tipo').textContent,
+    norma: document.getElementById('tot-r-norma').textContent,
+    icu: document.getElementById('tot-r-icu').textContent,
+    calibre: document.getElementById('tot-r-calibre').textContent,
+    ampacidad: document.getElementById('tot-r-ampacidad').textContent,
+    material: document.getElementById('tot-r-material').textContent,
+    aislamiento: document.getElementById('tot-r-aislamiento').textContent,
+  };
+  historial.unshift(nuevo);
+  if (historial.length > MAX_HIST) historial.splice(MAX_HIST);
+  localStorage.setItem(DB_KEY_TOT, JSON.stringify(historial));
+  showToast('✓ Cálculo guardado en historial');
+}
+
+function borrarHistorialTot() {
+  document.getElementById('modal-borrar').style.display = 'flex';
+  document.getElementById('modal-borrar').dataset.tipo = 'tot';
+}
+
+function renderHistorialTot() {
+  const hist = cargarHistorialTot();
+  const list = document.getElementById('hist-tot-list');
+  const empty = document.getElementById('hist-tot-empty');
+  const count = document.getElementById('hist-tot-count');
+  count.textContent = hist.length + ' cálculo' + (hist.length !== 1 ? 's' : '') + ' guardado' + (hist.length !== 1 ? 's' : '');
+  if (hist.length === 0) { list.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  list.innerHTML = hist.map(c => `
+    <div style="background:var(--crd);border:1px solid var(--bd);border-radius:10px;padding:11px 12px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--txt)">${c.empresa}</div>
+          <div style="font-size:9px;color:var(--mut)">${c.proyecto}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:8px;color:var(--mut)">${c.fecha} ${c.hora}</div>
+          <button onclick="borrarCalculo(${c.id})" style="margin-top:3px;background:transparent;border:1px solid rgba(232,64,12,.3);border-radius:5px;color:var(--pr);font-size:8px;padding:2px 7px;cursor:pointer">🗑</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:8.5px">
+        <div style="color:var(--mut)">Sistema: <span style="color:var(--txt)">${c.sistema}</span></div>
+        <div style="color:var(--mut)">Tensión: <span style="color:var(--txt)">${c.tension}</span></div>
+        <div style="color:var(--mut)">Potencia: <span style="color:var(--txt)">${c.pot}</span></div>
+        <div style="color:var(--mut)">I Demanda: <span style="color:var(--pr);font-weight:600">${c.iDemanda}</span></div>
+        <div style="color:var(--mut)">I Diseño: <span style="color:var(--pr);font-weight:600">${c.iDiseno}</span></div>
+        <div style="color:var(--mut)">Breaker: <span style="color:var(--pr);font-weight:600">${c.breaker}</span></div>
+        <div style="color:var(--mut)">Tipo: <span style="color:#4A90D9">${c.tipo}</span></div>
+        <div style="color:var(--mut)">Calibre: <span style="color:var(--grn)">${c.calibre}</span></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── PDF TOTALIZADOR ──────────────────────────────────────────────────────────
+function totExportarPDF(modo = 'guardar') {
+  const iDem = document.getElementById('tot-r-idem').textContent;
+  if (!iDem || iDem === '—') { showToast('⚠ Primero realiza el cálculo'); return; }
+
+  function _buildTotPDF() {
+    try {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const W = 210, ML = 14, MR = 14, U = W - ML - MR;
+      const fecha = new Date().toLocaleDateString('es-CO');
+      const empresa = document.getElementById('tot-empresa').value || 'ElectroCol';
+      const proyecto = document.getElementById('tot-proyecto').value || 'Selección de Interruptor General';
+
+      const PR = '#E8400C', ACC = '#FFB703', GRN = '#2EC4B6', BLU = '#4A90D9', MUT = '#8FA3B4';
+
+      function rg(h) { return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]; }
+      function fc(h) { doc.setFillColor(...rg(h)); }
+      function dc(h) { doc.setDrawColor(...rg(h)); }
+      function tc(h) { doc.setTextColor(...rg(h)); }
+      function tx(x, y, s, col, sz, al, bo) { doc.setFontSize(sz||9); doc.setFont('helvetica', bo?'bold':'normal'); tc(col||'#1A2F47'); doc.text(String(s), x, y, { align: al||'left' }); }
+      function bx(x, y, w, h, fill, stroke, r) {
+        doc.setLineWidth(0.3);
+        const hexOk = s => typeof s==='string' && /^#[0-9A-Fa-f]{6}$/.test(s);
+        if (fill && hexOk(fill)) fc(fill);
+        if (stroke && hexOk(stroke)) dc(stroke);
+        const m = (fill&&hexOk(fill))&&(stroke&&hexOk(stroke))?'FD':(fill&&hexOk(fill))?'F':'S';
+        r ? doc.roundedRect(x,y,w,h,r,r,m) : doc.rect(x,y,w,h,m);
+      }
+      function ln(x1,y1,x2,y2,col,lw) { dc(col||MUT); doc.setLineWidth(lw||0.3); doc.line(x1,y1,x2,y2); }
+      function sh(yy, title, col) { bx(ML,yy,U,7,col||'#1A2F47',null,2); tx(ML+3,yy+5,title,'#F0EDE8',9.5,'left',true); return yy+10; }
+
+      let y = 10;
+
+      function tbl(data, cw, hbg) {
+        const [hdr, ...rows] = data;
+        let rx = ML;
+        hdr.forEach((c, i) => { bx(rx,y,cw[i],6,hbg||'#0D1B2A',null); tx(rx+2,y+4.2,c,'#FFFFFF',7.5,'left',true); rx+=cw[i]; });
+        y += 6;
+        rows.forEach((row, ri) => {
+          const bg = ri%2===0?'#FFFFFF':'#F4F7FA'; rx = ML;
+          row.forEach((cell, ci) => {
+            bx(rx,y,cw[ci],5.5,bg,null); ln(rx,y,rx+cw[ci],y,'#D0DCE8',0.2);
+            tx(rx+2,y+3.8,String(cell),'#1A2F47',8,'left',ci===0); rx+=cw[ci];
+          });
+          y += 5.5;
+        });
+        dc('#D0DCE8'); doc.setLineWidth(0.3); doc.rect(ML,y-rows.length*5.5-6,U,rows.length*5.5+6);
+        y += 4;
+      }
+
+      // HEADER
+      bx(ML,y,U,42,'#0D1B2A',null,3);
+      bx(ML,y,3.5,42,'#E8400C',null,0);
+      bx(ML+3.5,y+36,U-3.5,6,'#1A2F47',null,0);
+      const electroW = doc.getTextWidth('ELECTRO');
+      tx(ML+7,y+10,'ELECTRO','#F0EDE8',20,'left',true);
+      tx(ML+7+electroW,y+10,'COL','#E8400C',20,'left',true);
+      tx(ML+7,y+15,'Calculos Electricos para Colombia  |  RETIE · NTC 2050 · IEC','#8FA3B4',7);
+      tx(ML+7,y+22,empresa,'#F0EDE8',10,'left',true);
+      tx(ML+7,y+27,proyecto,'#B0C8DC',8.5);
+      tx(W-MR-3,y+22,'Fecha: '+fecha,'#8FA3B4',7,'right');
+      [[ML+7,'RETIE 2013','#E8400C'],[ML+32,'NTC 2050','#1A2F47'],[ML+55,'IEC 60947','#2C4A6E']].forEach(([bx2,bl,bc]) => {
+        const bw = bl.length*2.2+6; bx(bx2,y+33,bw,4.5,bc,null,1.5); tx(bx2+bw/2,y+37,bl,'#FFFFFF',6,'center',true);
+      });
+      bx(W-MR-60,y+33,58,4.5,'#142233',null,1.5);
+      tx(W-MR-31,y+37,'Interruptor General','#F0EDE8',6,'center',true);
+      y += 47;
+
+      // 1. DATOS DEL SISTEMA
+      y = sh(y, '1.  Datos del Sistema Electrico');
+      tbl([
+        ['Parametro','Valor'],
+        ['Tipo de sistema', document.getElementById('tot-r-sistema').textContent],
+        ['Tension nominal', document.getElementById('tot-r-tension').textContent],
+        ['Potencia total instalada', document.getElementById('tot-r-pot').textContent],
+        ['Factor de demanda (FD)', document.getElementById('tot-r-fd').textContent],
+        ['Factor de potencia (FP)', document.getElementById('tot-r-fp').textContent],
+        ['Frecuencia', '60 Hz — Red Colombia'],
+      ], [90, U-90]);
+
+      // 2. CORRIENTES DE DISEÑO
+      y = sh(y, '2.  Corrientes de Diseno — NTC 2050 Art.220');
+      tbl([
+        ['Parametro','Valor','Norma'],
+        ['Corriente de demanda total (I_dem)', document.getElementById('tot-r-idem').textContent, 'NTC 2050 Art.220'],
+        ['Corriente de diseno (I_dem x 1.25)', document.getElementById('tot-r-idis').textContent, 'NTC 2050 Art.215.3'],
+      ], [90, 50, U-140]);
+
+      // 3. INTERRUPTOR GENERAL
+      y = sh(y, '3.  Seleccion del Interruptor General');
+      tbl([
+        ['Parametro','Valor'],
+        ['Capacidad del interruptor', document.getElementById('tot-r-breaker').textContent],
+        ['Tipo de interruptor', document.getElementById('tot-r-tipo').textContent],
+        ['Norma aplicable', document.getElementById('tot-r-norma').textContent],
+        ['Poder de corte minimo (Icu)', document.getElementById('tot-r-icu').textContent],
+      ], [90, U-90]);
+
+      // 4. CONDUCTOR PRINCIPAL
+      y = sh(y, '4.  Conductor Principal — NTC 2050 Art.310');
+      tbl([
+        ['Parametro','Valor'],
+        ['Calibre recomendado', document.getElementById('tot-r-calibre').textContent],
+        ['Capacidad de conduccion (ampacidad)', document.getElementById('tot-r-ampacidad').textContent],
+        ['Material', document.getElementById('tot-r-material').textContent],
+        ['Tipo de aislamiento', document.getElementById('tot-r-aislamiento').textContent],
+        ['Norma conductor', 'NTC 2050 Art.310 (basado en NEC)'],
+      ], [90, U-90]);
+
+      // 5. REFERENCIAS COMERCIALES COLOMBIA
+      y = sh(y, '5.  Referencias Comerciales Colombia', '#142233');
+      const breakerAmpPDF = parseInt(document.getElementById('tot-r-breaker').textContent);
+      const tipoStr = document.getElementById('tot-r-tipo').textContent;
+      const esTri = document.getElementById('tot-r-sistema').textContent.includes('Trifasico') ||
+                    document.getElementById('tot-r-sistema').textContent.includes('Trifásico');
+      const refsPDF = totGetRefs(breakerAmpPDF, tipoStr, esTri);
+
+      // Nota rangos
+      doc.setFontSize(7); doc.setFont('helvetica','normal'); tc(MUT);
+      doc.text('Breaker: ' + breakerAmpPDF + ' A — ' + tipoStr + ' | Marcas disponibles en Colombia: Schneider · ABB · WEG · CHINT · Siemens · Rockwell/A-B', ML+2, y);
+      y += 5;
+
+      const marcasPDF = refsPDF.map(r => [r[0], r[1].substring(0,35), r[3]]);
+      tbl([
+        ['Marca','Referencia / Serie','Rango / Norma'],
+        ...marcasPDF
+      ], [36, 78, U-114]);
+
+      // 6. NOTA LEGAL
+      y = sh(y, '6.  Nota Tecnica y Legal', '#142233');
+      const nota = [
+        'Este calculo fue generado con ElectroCol bajo NTC 2050, RETIE Res.90708/2013 e IEC 60947.',
+        'Los valores deben ser verificados por un Ingeniero Electricista matriculado (RETIE Art.4).',
+        'Seleccionar siempre el calibre comercial inmediatamente superior al calculado.',
+        'Verificar coordinacion de protecciones con estudio de cortocircuito (RETIE Art.16).',
+      ];
+      nota.forEach(n => {
+        const lines = doc.splitTextToSize('• ' + n, U-6);
+        doc.setFontSize(7.5); doc.setFont('helvetica','normal'); tc(MUT);
+        doc.text(lines, ML+3, y);
+        y += lines.length * 4;
+      });
+
+      // FOOTER
+      const totalPages = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        ln(ML, 287, W-MR, 287, '#1A2F47', 0.5);
+        tx(ML, 291, 'ElectroCol — Calculos Electricos Colombia', MUT, 7);
+        tx(W-MR, 291, 'Pagina ' + i + ' de ' + totalPages, MUT, 7, 'right');
+      }
+
+      const nombre = 'ElectroCol_InterruptorGeneral_' + fecha.replace(/\//g, '-') + '.pdf';
+
+      if (modo === 'compartir' && navigator.share) {
+        doc.output('blob').then ? null : null;
+        const blob = doc.output('blob');
+        const file = new File([blob], nombre, { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: 'Interruptor General', text: proyecto });
+          return;
+        }
+      }
+      doc.save(nombre);
+      showToast('✓ PDF guardado: ' + nombre);
+
+    } catch(e) {
+      showToast('⚠ Error generando PDF');
+      console.error(e);
+    }
+  }
+
+  if (typeof window.jspdf === 'undefined') {
+    showToast('⏳ Cargando generador PDF...');
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload = () => setTimeout(_buildTotPDF, 300);
+    s.onerror = () => showToast('⚠ Sin internet para generar PDF');
+    document.head.appendChild(s);
+    return;
+  }
+  showToast('⏳ Generando PDF...');
+  setTimeout(_buildTotPDF, 150);
+}
+
+let TOT_FASE = 'tri';
+let TOT_MATERIAL = 'cu';
+
+function totSetFase(f) {
+  TOT_FASE = f;
+  document.getElementById('tot-bt-tri').className = 'tb' + (f === 'tri' ? ' on' : '');
+  document.getElementById('tot-bt-mono').className = 'tb' + (f === 'mono' ? ' on' : '');
+  const sel = document.getElementById('tot-tension');
+  sel.innerHTML = f === 'tri'
+    ? '<option value="440">440 V — Trifásico</option><option value="220tri">220 V — Trifásico</option>'
+    : '<option value="220mono">220 V — Monofásico</option><option value="110">110 V — Monofásico</option>';
+  document.getElementById('tot-resultados').style.display = 'none';
+}
+
+function totUpdateTension() {
+  document.getElementById('tot-resultados').style.display = 'none';
+}
+
+function totSetMaterial(m) {
+  TOT_MATERIAL = m;
+  document.getElementById('tot-bt-cu').className = 'tb' + (m === 'cu' ? ' on' : '');
+  document.getElementById('tot-bt-al').className = 'tb' + (m === 'al' ? ' on' : '');
+  document.getElementById('tot-resultados').style.display = 'none';
+}
+
+function totConvertir() {
+  const pot = parseFloat(document.getElementById('tot-pot').value);
+  const unidad = document.getElementById('tot-unidad').value;
+  const box = document.getElementById('tot-conv-box');
+  if (!pot || pot <= 0) { box.style.display = 'none'; return; }
+  if (unidad === 'hp') {
+    const kw = pot * 0.7457;
+    box.style.display = 'block';
+    box.textContent = `${pot} HP = ${kw.toFixed(2)} kW (1 HP = 0.7457 kW)`;
+  } else {
+    const hp = pot / 0.7457;
+    box.style.display = 'block';
+    box.textContent = `${pot} kW = ${hp.toFixed(2)} HP (1 HP = 0.7457 kW)`;
+  }
+}
+
+// Tablas de conductores NTC 2050 Art.310 — ampacidad base a 30°C
+// [AWG/kcmil, ampacidad_Cu, ampacidad_Al, descripcion]
+const TOT_CONDUCTORES_CU = [
+  { cal: '14 AWG',  amp: 15,   desc: '14 AWG' },
+  { cal: '12 AWG',  amp: 20,   desc: '12 AWG' },
+  { cal: '10 AWG',  amp: 30,   desc: '10 AWG' },
+  { cal: '8 AWG',   amp: 50,   desc: '8 AWG'  },
+  { cal: '6 AWG',   amp: 65,   desc: '6 AWG'  },
+  { cal: '4 AWG',   amp: 85,   desc: '4 AWG'  },
+  { cal: '3 AWG',   amp: 100,  desc: '3 AWG'  },
+  { cal: '2 AWG',   amp: 115,  desc: '2 AWG'  },
+  { cal: '1 AWG',   amp: 130,  desc: '1 AWG'  },
+  { cal: '1/0 AWG', amp: 150,  desc: '1/0 AWG'},
+  { cal: '2/0 AWG', amp: 175,  desc: '2/0 AWG'},
+  { cal: '3/0 AWG', amp: 200,  desc: '3/0 AWG'},
+  { cal: '4/0 AWG', amp: 230,  desc: '4/0 AWG'},
+  { cal: '250 kcmil',amp: 255, desc: '250 kcmil'},
+  { cal: '300 kcmil',amp: 285, desc: '300 kcmil'},
+  { cal: '350 kcmil',amp: 310, desc: '350 kcmil'},
+  { cal: '400 kcmil',amp: 335, desc: '400 kcmil'},
+  { cal: '500 kcmil',amp: 380, desc: '500 kcmil'},
+  { cal: '600 kcmil',amp: 420, desc: '600 kcmil'},
+  { cal: '700 kcmil',amp: 460, desc: '700 kcmil'},
+  { cal: '750 kcmil',amp: 475, desc: '750 kcmil'},
+];
+
+const TOT_CONDUCTORES_AL = [
+  { cal: '12 AWG',  amp: 15,   desc: '12 AWG' },
+  { cal: '10 AWG',  amp: 25,   desc: '10 AWG' },
+  { cal: '8 AWG',   amp: 40,   desc: '8 AWG'  },
+  { cal: '6 AWG',   amp: 50,   desc: '6 AWG'  },
+  { cal: '4 AWG',   amp: 65,   desc: '4 AWG'  },
+  { cal: '3 AWG',   amp: 75,   desc: '3 AWG'  },
+  { cal: '2 AWG',   amp: 90,   desc: '2 AWG'  },
+  { cal: '1 AWG',   amp: 100,  desc: '1 AWG'  },
+  { cal: '1/0 AWG', amp: 120,  desc: '1/0 AWG'},
+  { cal: '2/0 AWG', amp: 135,  desc: '2/0 AWG'},
+  { cal: '3/0 AWG', amp: 155,  desc: '3/0 AWG'},
+  { cal: '4/0 AWG', amp: 180,  desc: '4/0 AWG'},
+  { cal: '250 kcmil',amp: 205, desc: '250 kcmil'},
+  { cal: '300 kcmil',amp: 230, desc: '300 kcmil'},
+  { cal: '350 kcmil',amp: 250, desc: '350 kcmil'},
+  { cal: '400 kcmil',amp: 270, desc: '400 kcmil'},
+  { cal: '500 kcmil',amp: 310, desc: '500 kcmil'},
+  { cal: '600 kcmil',amp: 340, desc: '600 kcmil'},
+  { cal: '700 kcmil',amp: 375, desc: '700 kcmil'},
+  { cal: '750 kcmil',amp: 385, desc: '750 kcmil'},
+];
+
+// Tabla de breakers comerciales estándar Colombia
+const TOT_BREAKERS = [10,15,16,20,25,30,32,40,50,60,63,70,80,90,100,110,125,150,160,175,200,225,250,300,315,350,400,450,500,600,630,700,800,1000,1200,1600,2000,2500,3000];
+
+function totGetBreaker(i) {
+  for (let b of TOT_BREAKERS) { if (b >= i) return b; }
+  return Math.ceil(i / 100) * 100;
+}
+
+function totGetTipo(amp) {
+  if (amp <= 100)  return { tipo: 'Termomagnético (MCB)', norma: 'IEC 60898 / NTC 4661', icu: '10 kA' };
+  if (amp <= 250)  return { tipo: 'Caja Moldeada (MCCB)', norma: 'IEC 60947-2 / NTC 5387', icu: '25 kA' };
+  if (amp <= 630)  return { tipo: 'Caja Moldeada (MCCB) Industrial', norma: 'IEC 60947-2', icu: '36 kA' };
+  return           { tipo: 'Interruptor de Aire (ACB)', norma: 'IEC 60947-2', icu: '50 kA' };
+}
+
+function totGetConductor(iDis, temp, agrup) {
+  const tabla = TOT_MATERIAL === 'cu' ? TOT_CONDUCTORES_CU : TOT_CONDUCTORES_AL;
+  // Corriente ajustada por factores de corrección
+  const iAjustada = iDis / (parseFloat(temp) * parseFloat(agrup));
+  for (let c of tabla) {
+    if (c.amp >= iAjustada) return { ...c, iAjustada: iAjustada.toFixed(1) };
+  }
+  return { cal: '> 750 kcmil (paralelo)', amp: '—', iAjustada: iAjustada.toFixed(1), desc: 'Usar conductores en paralelo' };
+}
+
+function calcTotalizador() {
+  const potVal  = parseFloat(document.getElementById('tot-pot').value);
+  const unidad  = document.getElementById('tot-unidad').value;
+  const tension = document.getElementById('tot-tension').value;
+  const fd      = parseFloat(document.getElementById('tot-fd').value);
+  const fp      = parseFloat(document.getElementById('tot-fp').value);
+  const temp    = document.getElementById('tot-temp').value;
+  const agrup   = document.getElementById('tot-agrup').value;
+
+  // Validaciones
+  if (!potVal || potVal <= 0) { showToast('⚠ Ingresa la potencia total'); return; }
+  if (!fd || fd <= 0 || fd > 1) { showToast('⚠ Factor de demanda debe ser 0.1–1.0'); return; }
+  if (!fp || fp <= 0 || fp > 1) { showToast('⚠ Factor de potencia debe ser 0.1–1.0'); return; }
+
+  // Convertir a kW
+  const potKW = unidad === 'hp' ? potVal * 0.7457 : potVal;
+  const potW  = potKW * 1000;
+
+  // Tensión numérica y tipo
+  let V, esTrifasico, tensionLabel;
+  switch (tension) {
+    case '440':    V = 440; esTrifasico = true;  tensionLabel = '440 V Trifásico'; break;
+    case '220tri': V = 220; esTrifasico = true;  tensionLabel = '220 V Trifásico'; break;
+    case '220mono':V = 220; esTrifasico = false; tensionLabel = '220 V Monofásico'; break;
+    case '110':    V = 110; esTrifasico = false; tensionLabel = '110 V Monofásico'; break;
+    default:       V = 440; esTrifasico = true;  tensionLabel = '440 V Trifásico';
+  }
+
+  // Cálculo de corriente de demanda — NTC 2050 Art.220
+  let iDemanda;
+  if (esTrifasico) {
+    iDemanda = (potW * fd) / (Math.sqrt(3) * V * fp);
+  } else {
+    iDemanda = (potW * fd) / (V * fp);
+  }
+
+  // Corriente de diseño — NTC 2050 Art.215 (factor 1.25)
+  const iDiseno = iDemanda * 1.25;
+
+  // Selección del breaker
+  const breakerAmp = totGetBreaker(iDiseno);
+  const breaker    = totGetTipo(breakerAmp);
+
+  // Selección del conductor con factores de corrección
+  const conductor  = totGetConductor(iDiseno, temp, agrup);
+
+  // Mostrar resultados
+  document.getElementById('tot-r-idem').textContent     = iDemanda.toFixed(1) + ' A';
+  document.getElementById('tot-r-idis').textContent     = iDiseno.toFixed(1) + ' A';
+  document.getElementById('tot-r-breaker').textContent  = breakerAmp + ' A';
+  document.getElementById('tot-r-tipo').textContent     = breaker.tipo;
+  document.getElementById('tot-r-norma').textContent    = breaker.norma;
+  document.getElementById('tot-r-icu').textContent      = breaker.icu + ' mínimo';
+  document.getElementById('tot-r-calibre').textContent  = conductor.cal;
+  document.getElementById('tot-r-ampacidad').textContent= conductor.amp + ' A';
+  document.getElementById('tot-r-material').textContent = TOT_MATERIAL === 'cu' ? 'Cobre (Cu) — 100%' : 'Aluminio (Al) — 61%';
+  document.getElementById('tot-r-aislamiento').textContent = 'THHN / THWN-2 (90°C)';
+  document.getElementById('tot-r-pot').textContent      = potKW.toFixed(2) + ' kW' + (unidad === 'hp' ? ' (' + potVal + ' HP)' : '');
+  document.getElementById('tot-r-tension').textContent  = tensionLabel;
+  document.getElementById('tot-r-fd').textContent       = (fd * 100).toFixed(0) + '%';
+  document.getElementById('tot-r-fp').textContent       = (fp * 100).toFixed(0) + '%';
+  document.getElementById('tot-r-sistema').textContent  = esTrifasico ? 'Trifásico 3F+N+T' : 'Monofásico 1F+N+T';
+
+  // Advertencias
+  const adv = document.getElementById('tot-advertencia');
+  let avisos = [];
+  if (potKW > 500) avisos.push('⚠ Potencia mayor a 500 kW: consultar estudio de cortocircuito (RETIE Art.16).');
+  if (fp < 0.80)   avisos.push('⚠ Factor de potencia menor a 0.80: instalar banco de condensadores (RETIE Art.20).');
+  if (conductor.cal.includes('paralelo')) avisos.push('⚠ Corriente muy alta: usar conductores en paralelo. Consultar NTC 2050 Art.310.4.');
+  if (TOT_MATERIAL === 'al') avisos.push('ℹ Conductor de aluminio: usar conectores bimetálicos certificados. No usar en calibres menores a 12 AWG (NTC 2050 Art.310.14).');
+
+  if (avisos.length > 0) {
+    adv.style.display = 'block';
+    adv.innerHTML = avisos.join('<br><br>');
+  } else {
+    adv.style.display = 'none';
+  }
+
+  document.getElementById('tot-resultados').style.display = 'block';
+  totRenderRefs(breakerAmp, breaker.tipo, esTrifasico);
+  document.getElementById('tot-resultados').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  showToast('✓ Totalizador calculado');
+}
+
+// ── REFERENCIAS COMERCIALES TOTALIZADOR ──────────────────────────────────────
+// Estructura de cada ref: [marca, serie, descripcion_con_polos_y_amp, norma_rango]
+function totGetRefs(amp, tipo, trifasico) {
+  // Polos según tipo de sistema
+  const p3 = trifasico ? '3P' : '2P';       // interruptor bipolar en mono, tripolar en tri
+  const voltStr = trifasico ? '440/220 V' : '220/110 V';
+
+  // ── ≤63 A — MCB (Termomagnético miniatura) ────────────────────────────────
+  if (amp <= 63) {
+    return [
+      ['Schneider', 'Acti9 iC60N / iC60H',
+        'A9F7' + (trifasico?'6':'4') + '3' + String(amp).padStart(2,'0') + ' · Curva C · ' + p3 + ' · ' + amp + 'A · 6 kA @ 220V',
+        '≤63 A · MCB · IEC 60898-1 / IEC 60947-2'],
+      ['ABB',
+        'S2' + (trifasico?'03':'02') + '-C' + amp,
+        'System Pro M Compact · Curva C · ' + p3 + ' · ' + amp + 'A · 6 kA @ 400V',
+        '≤63 A · MCB · IEC 60898-1'],
+      ['WEG',
+        'MDW-' + amp + 'C' + (trifasico?'3':'2'),
+        'Termomagnético MDW · Curva C · ' + p3 + ' · ' + amp + 'A · 6 kA @ 220V',
+        '≤63 A · MCB · IEC 60898-1'],
+      ['CHINT',
+        'NB1-63C' + amp + (trifasico?'/3':'') + ' / NB1L-63',
+        'NB1 series · Curva C · ' + p3 + ' · ' + amp + 'A · 6 kA @ 230V',
+        '≤63 A · MCB · IEC 60898 / CE / CB'],
+      ['Siemens',
+        '5SL' + (trifasico?'6':'4') + String(amp).padStart(3,'0') + '7 SENTRON',
+        '5SL · Curva C · ' + p3 + ' · ' + amp + 'A · 6 kA @ 400V',
+        '≤63 A · MCB · IEC 60898-1'],
+      ['Rockwell / A-B',
+        '1489-M' + (trifasico?'3':'2') + 'C' + String(amp).padStart(3,'0'),
+        '1489-M · Curva C · ' + p3 + ' · ' + amp + 'A · ' + voltStr,
+        '≤63 A · MCB · IEC 60947-2 / UL 489'],
+    ];
+  }
+
+  // ── 64–160 A — MCCB marco pequeño ─────────────────────────────────────────
+  if (amp <= 160) {
+    return [
+      ['Schneider',
+        'EasyPact CVS100' + (amp<=100?'B':'N') + ' / EZC100',
+        'EZC100 · TM-D · ' + p3 + ' · ' + amp + 'A · ' + (amp<=100?'25':'36') + ' kA @ 415V',
+        '63–160 A · MCCB · IEC 60947-2'],
+      ['ABB',
+        'Tmax XT1' + (amp<=100?'B':'N') + ' 160 · T2' + (amp<=100?'N':'H') + String(amp),
+        'Tmax XT1 / T2 · TM · ' + p3 + ' · ' + amp + 'A · ' + (amp<=100?'25':'36') + ' kA @ 415V',
+        '63–160 A · MCCB · IEC 60947-2'],
+      ['WEG',
+        'DWB160' + (amp<=100?'B':'N') + String(amp) + '-' + (trifasico?'3':'2') + 'DX',
+        'DWB160 · Termomagnético · ' + p3 + ' · ' + amp + 'A · 18 kA @ 380V',
+        '63–160 A · MCCB · IEC 60947-1/-2'],
+      ['CHINT',
+        'NM8N-' + (amp<=125?'125':'250') + 'S · ' + p3 + ' · TM',
+        'NM8N series · TM · ' + p3 + ' · ' + amp + 'A · 25 kA @ 415V',
+        '63–160 A · MCCB · IEC 60947-2 / CE'],
+      ['Siemens',
+        '3VA1' + String(amp).padStart(3,'0') + '-' + (trifasico?'3':'2') + 'ED32 SENTRON',
+        '3VA1 · TM · ' + p3 + ' · ' + amp + 'A · 36 kA @ 415V',
+        '63–160 A · MCCB · IEC 60947-2'],
+      ['Rockwell / A-B',
+        '140G-G' + (trifasico?'3':'2') + 'C3-' + String(amp).padStart(4,'0'),
+        'Bul.140G G-Frame · TM · ' + p3 + ' · ' + amp + 'A · 35 kA @ 480V',
+        '63–160 A · MCCB · IEC 60947-2 / UL 489'],
+    ];
+  }
+
+  // ── 161–250 A — MCCB marco mediano ────────────────────────────────────────
+  if (amp <= 250) {
+    return [
+      ['Schneider',
+        'EasyPact CVS250' + (amp<=200?'N':'F') + ' / ComPact NSX250',
+        'CVS250 / NSX250 · TM-D · ' + p3 + ' · ' + amp + 'A · ' + (amp<=200?'36':'50') + ' kA @ 415V',
+        '160–250 A · MCCB · IEC 60947-2'],
+      ['ABB',
+        'Tmax T4' + (amp<=200?'N':'H') + '250 · ' + p3 + ' · TMA',
+        'T4 Tmax · TMA regulable · ' + p3 + ' · ' + amp + 'A · 36 kA @ 415V',
+        '160–250 A · MCCB · IEC 60947-2'],
+      ['WEG',
+        'DWB250' + (amp<=200?'N':'H') + String(amp) + '-' + (trifasico?'3':'2') + 'GF',
+        'DWB250 · TM ajustable · ' + p3 + ' · ' + amp + 'A · 25 kA @ 380V',
+        '160–250 A · MCCB · IEC 60947-2'],
+      ['CHINT',
+        'NM8N-250S · ' + p3 + ' · TM · ' + amp + 'A',
+        'NM8N-250S · TM · ' + p3 + ' · ' + amp + 'A · 36 kA @ 415V',
+        '160–250 A · MCCB · IEC 60947-2 / CE'],
+      ['Siemens',
+        '3VA2' + String(amp).padStart(3,'0') + '-' + (trifasico?'5':'3') + 'HF32 SENTRON',
+        '3VA2 · ETU320 · ' + p3 + ' · ' + amp + 'A · 55 kA @ 415V',
+        '160–250 A · MCCB · IEC 60947-2'],
+      ['Rockwell / A-B',
+        '140G-H' + (trifasico?'3':'2') + 'C3-' + String(amp).padStart(4,'0'),
+        'Bul.140G H-Frame · TM · ' + p3 + ' · ' + amp + 'A · 65 kA @ 480V',
+        '160–250 A · MCCB · IEC 60947-2 / UL 489'],
+    ];
+  }
+
+  // ── 251–630 A — MCCB industrial ───────────────────────────────────────────
+  if (amp <= 630) {
+    return [
+      ['Schneider',
+        'ComPact NSX400' + (amp<=400?'F':'H') + ' / NSX630',
+        'ComPact NSX · MicroLogic · ' + p3 + ' · ' + amp + 'A · ' + (amp<=400?'36':'70') + ' kA @ 415V',
+        '250–630 A · MCCB Ind. · IEC 60947-2'],
+      ['ABB',
+        'Tmax T5' + (amp<=400?'N':'H') + '400 / T6' + (amp<=630?'N':'H') + '630',
+        'Tmax T5/T6 · PR221DS-LS/I · ' + p3 + ' · ' + amp + 'A · 36 kA @ 415V',
+        '250–630 A · MCCB Ind. · IEC 60947-2'],
+      ['WEG',
+        'DWA800' + (amp<=400?'N':'H') + String(amp) + '-' + (trifasico?'3':'2') + 'GF / DWB400',
+        'DWA/DWB · TM ajustable · ' + p3 + ' · ' + amp + 'A · 36 kA @ 380V',
+        '250–630 A · MCCB Ind. · IEC 60947-2'],
+      ['CHINT',
+        'NM8N-630S / NM8N-800S · ' + p3 + ' · TM · ' + amp + 'A',
+        'NM8N-630/800S · TM/LSI · ' + p3 + ' · ' + amp + 'A · 50 kA @ 415V',
+        '250–630 A · MCCB Ind. · IEC 60947-2 / CE'],
+      ['Siemens',
+        '3VA2' + String(amp).padStart(3,'0') + '-' + (trifasico?'7':'5') + 'KF32 / 3VL3 SENTRON',
+        '3VA2 / 3VL · ETU · ' + p3 + ' · ' + amp + 'A · 55–85 kA @ 415V',
+        '250–630 A · MCCB Ind. · IEC 60947-2'],
+      ['Rockwell / A-B',
+        '140G-J' + (trifasico?'3':'2') + 'C3-' + String(amp).padStart(4,'0') + ' / 140G-K',
+        'Bul.140G J/K-Frame · ' + p3 + ' · ' + amp + 'A · 65–100 kA @ 480V',
+        '250–630 A · MCCB Ind. · IEC 60947-2 / UL 489'],
+    ];
+  }
+
+  // ── >630 A — ACB (Interruptor de Aire) ────────────────────────────────────
+  return [
+    ['Schneider',
+      'Masterpact MTZ1 / MTZ2' + (amp<=1600?' / MTZ3':''),
+      'Masterpact MTZ · MicroLogic · ' + p3 + ' · ' + amp + 'A · 66–150 kA @ 690V',
+      '>630 A · ACB · IEC 60947-2'],
+    ['ABB',
+      'Emax2 E1.' + (amp<=1000?'2':'6') + ' / E2.' + (amp<=1600?'0':'5') + ' · ' + p3,
+      'Emax2 · PR122/PR123 · ' + p3 + ' · ' + amp + 'A · 65–150 kA @ 690V',
+      '>630 A · ACB · IEC 60947-2'],
+    ['WEG',
+      'DWA1600-E · ' + p3 + ' · LSI · ' + amp + 'A',
+      'DWA1600 · Electrónico LSI · ' + p3 + ' · ' + amp + 'A · 85 kA @ 380V',
+      '>630 A · ACB · IEC 60947-2'],
+    ['CHINT',
+      'NA1-' + (amp<=1600?'2000':'4000') + (trifasico?'/3':'/2') + ' · ' + amp + 'A',
+      'NA1 series · LSI · ' + p3 + ' · ' + amp + 'A · 65–100 kA @ 400V',
+      '>630 A · ACB · IEC 60947-2 / CE'],
+    ['Siemens',
+      '3WL' + (amp<=1600?'1':'2') + (trifasico?'3':'2') + 'xxx-' + amp + 'A SENTRON',
+      'SENTRON 3WL · ETU45B · ' + p3 + ' · ' + amp + 'A · 66–150 kA @ 690V',
+      '>630 A · ACB · IEC 60947-2'],
+    ['Rockwell / A-B',
+      '140G-Pxxx-' + String(amp).padStart(4,'0') + ' · ' + p3 + ' · ' + amp + 'A',
+      'Bul.140G P-Frame · LSIG · ' + p3 + ' · ' + amp + 'A · 85–100 kA @ 480V',
+      '>630 A · MCCB/ACB · IEC 60947-2 / UL 489'],
+  ];
+}
+
+function totRenderRefs(amp, tipo, trifasico) {
+  const refs = totGetRefs(amp, tipo, trifasico);
+  const marcaColores = {
+    'Schneider':      '#3DCD58',
+    'ABB':            '#FF000F',
+    'WEG':            '#0055A5',
+    'CHINT':          '#E8400C',
+    'Siemens':        '#009999',
+    'Rockwell / A-B': '#C8102E',
+  };
+  // Etiqueta tipo breaker para el encabezado
+  let tipoLabel = amp<=63 ? 'MCB — Termomagnético miniatura' :
+                  amp<=630 ? 'MCCB — Caja moldeada' :
+                  'ACB — Interruptor de aire';
+  const tbl = `
+    <div style="font-size:8px;color:var(--mut);margin-bottom:6px;line-height:1.6">
+      <span style="color:var(--acc);font-weight:600">Tipo:</span> <b style="color:var(--txt)">${tipoLabel}</b> &nbsp;·&nbsp;
+      <span style="color:var(--acc);font-weight:600">Polos:</span> <b style="color:var(--txt)">${trifasico?'3P (Trifásico)':'2P (Monofásico)'}</b> &nbsp;·&nbsp;
+      <span style="color:var(--acc);font-weight:600">Corriente:</span> <b style="color:var(--txt)">${amp} A</b>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:7.5px;min-width:440px">
+      <thead>
+        <tr style="background:#0D1B2A">
+          <th style="padding:6px 7px;text-align:left;color:#4A90D9;font-weight:700;width:18%">Marca</th>
+          <th style="padding:6px 7px;text-align:left;color:var(--grn);font-weight:700;width:28%">Serie / Referencia</th>
+          <th style="padding:6px 7px;text-align:left;color:var(--txt);font-weight:700">Descripción</th>
+          <th style="padding:6px 7px;text-align:left;color:var(--acc);font-weight:700;width:22%">Rango / Norma</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${refs.map((r, i) => `
+          <tr style="background:${i % 2 === 0 ? 'transparent' : 'rgba(143,163,180,0.04)'}">
+            <td style="padding:5px 7px;font-weight:700;color:${marcaColores[r[0]] || 'var(--txt)'}">
+              <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${marcaColores[r[0]] || 'var(--txt)'};margin-right:5px;vertical-align:middle"></span>${r[0]}
+            </td>
+            <td style="padding:5px 7px;color:var(--txt);font-family:'Rajdhani',sans-serif;font-size:8.5px;font-weight:600;word-break:break-word">${r[1]}</td>
+            <td style="padding:5px 7px;color:var(--mut);word-break:break-word">${r[2]}</td>
+            <td style="padding:5px 7px;color:var(--acc);font-size:7px">${r[3]}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>`;
+  document.getElementById('tot-refs-tabla').innerHTML = tbl;
+}
 
 // ── Service Worker ─────────────────────────────────────────────────────────────
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
