@@ -1706,8 +1706,8 @@ function renderResultados(){
   const COND_CAP=getCOND(d.cond||'thhn');
   const calCap=COND_CAP.find(c=>c.a===d.cal);
   if(calCap) document.getElementById('r-cal-cap').textContent=calCap.c+' A máx · '+condDescStr+' · NTC Tabla 310-16';
-  // Mostrar por qué el calibre anterior no alcanza
-  const COND_LIST=[{a:'14 AWG',c:15},{a:'12 AWG',c:20},{a:'10 AWG',c:30},{a:'8 AWG',c:50},{a:'6 AWG',c:65},{a:'4 AWG',c:85},{a:'3 AWG',c:100},{a:'2 AWG',c:115},{a:'1 AWG',c:130},{a:'1/0 AWG',c:150},{a:'2/0 AWG',c:175},{a:'3/0 AWG',c:200},{a:'4/0 AWG',c:230}];
+  // Mostrar por qué el calibre anterior no alcanza (usar tabla correcta según tipo de aislamiento)
+  const COND_LIST=getCOND(d.cond||'thhn');
   const idxCal=COND_LIST.findIndex(c=>c.a===d.cal);
   const rCalWhy=document.getElementById('rr-calwhy');
   if(idxCal>0){
@@ -5154,13 +5154,14 @@ function totExportarPDF(modo = 'guardar') {
       bx(ML,y,U,42,'#0D1B2A',null,3);
       bx(ML,y,3.5,42,'#E8400C',null,0);
       bx(ML+3.5,y+36,U-3.5,6,'#1A2F47',null,0);
+      doc.setFontSize(20); doc.setFont('helvetica','bold');
       const electroW = doc.getTextWidth('ELECTRO');
       tx(ML+7,y+10,'ELECTRO','#F0EDE8',20,'left',true);
       tx(ML+7+electroW,y+10,'COL','#E8400C',20,'left',true);
-      tx(ML+7,y+15,'Calculos Electricos para Colombia  |  RETIE · NTC 2050 · IEC','#8FA3B4',7);
-      tx(ML+7,y+22,empresa,'#F0EDE8',10,'left',true);
-      tx(ML+7,y+27,proyecto,'#B0C8DC',8.5);
-      tx(W-MR-3,y+22,'Fecha: '+fecha,'#8FA3B4',7,'right');
+      tx(ML+7,y+16,'Calculos Electricos para Colombia  |  RETIE · NTC 2050 · IEC','#8FA3B4',7);
+      tx(ML+7,y+23,empresa,'#F0EDE8',10,'left',true);
+      tx(ML+7,y+29,proyecto,'#B0C8DC',8.5);
+      tx(W-MR-3,y+23,'Fecha: '+fecha,'#8FA3B4',7,'right');
       [[ML+7,'RETIE 2013','#E8400C'],[ML+32,'NTC 2050','#1A2F47'],[ML+55,'IEC 60947','#2C4A6E']].forEach(([bx2,bl,bc]) => {
         const bw = bl.length*2.2+6; bx(bx2,y+33,bw,4.5,bc,null,1.5); tx(bx2+bw/2,y+37,bl,'#FFFFFF',6,'center',true);
       });
@@ -5168,48 +5169,62 @@ function totExportarPDF(modo = 'guardar') {
       tx(W-MR-31,y+37,'Interruptor General','#F0EDE8',6,'center',true);
       y += 47;
 
+      // helper: sanitiza caracteres no-ASCII para jsPDF/helvetica
+      function san(s) {
+        return String(s)
+          .replace(/\u2264/g,'<=').replace(/\u2265/g,'>=')
+          .replace(/\u00B7/g,'-').replace(/\u2022/g,'-')
+          .replace(/[\u2013\u2014]/g,'-')
+          .replace(/[^\x00-\x7E]/g,'?');
+      }
+      // helper: salto de pagina si el bloque no cabe
+      function checkPage(needed) {
+        if (y + needed > 278) { doc.addPage(); y = 14; }
+      }
+
       // 1. DATOS DEL SISTEMA
       y = sh(y, '1.  Datos del Sistema Electrico');
       tbl([
         ['Parametro','Valor'],
-        ['Tipo de sistema', document.getElementById('tot-r-sistema').textContent],
-        ['Tension nominal', document.getElementById('tot-r-tension').textContent],
-        ['Potencia total instalada', document.getElementById('tot-r-pot').textContent],
-        ['Factor de demanda (FD)', document.getElementById('tot-r-fd').textContent],
-        ['Factor de potencia (FP)', document.getElementById('tot-r-fp').textContent],
-        ['Frecuencia', '60 Hz — Red Colombia'],
+        ['Tipo de sistema',         san(document.getElementById('tot-r-sistema').textContent)],
+        ['Tension nominal',         san(document.getElementById('tot-r-tension').textContent)],
+        ['Potencia total instalada',san(document.getElementById('tot-r-pot').textContent)],
+        ['Factor de demanda (FD)',  san(document.getElementById('tot-r-fd').textContent)],
+        ['Factor de potencia (FP)', san(document.getElementById('tot-r-fp').textContent)],
+        ['Frecuencia', '60 Hz - Red Colombia'],
       ], [90, U-90]);
 
-      // 2. CORRIENTES DE DISEÑO
-      y = sh(y, '2.  Corrientes de Diseno — NTC 2050 Art.220');
+      // 2. CORRIENTES DE DISENO
+      y = sh(y, '2.  Corrientes de Diseno - NTC 2050 Art.220');
       tbl([
         ['Parametro','Valor','Norma'],
-        ['Corriente de demanda total (I_dem)', document.getElementById('tot-r-idem').textContent, 'NTC 2050 Art.220'],
-        ['Corriente de diseno (I_dem x 1.25)', document.getElementById('tot-r-idis').textContent, 'NTC 2050 Art.215.3'],
+        ['Corriente de demanda total (I_dem)', san(document.getElementById('tot-r-idem').textContent), 'NTC 2050 Art.220'],
+        ['Corriente de diseno (I_dem x 1.25)', san(document.getElementById('tot-r-idis').textContent), 'NTC 2050 Art.215.3'],
       ], [90, 50, U-140]);
 
       // 3. INTERRUPTOR GENERAL
       y = sh(y, '3.  Seleccion del Interruptor General');
       tbl([
         ['Parametro','Valor'],
-        ['Capacidad del interruptor', document.getElementById('tot-r-breaker').textContent],
-        ['Tipo de interruptor', document.getElementById('tot-r-tipo').textContent],
-        ['Norma aplicable', document.getElementById('tot-r-norma').textContent],
-        ['Poder de corte minimo (Icu)', document.getElementById('tot-r-icu').textContent],
+        ['Capacidad del interruptor', san(document.getElementById('tot-r-breaker').textContent)],
+        ['Tipo de interruptor',       san(document.getElementById('tot-r-tipo').textContent)],
+        ['Norma aplicable',           san(document.getElementById('tot-r-norma').textContent)],
+        ['Poder de corte minimo (Icu)',san(document.getElementById('tot-r-icu').textContent)],
       ], [90, U-90]);
 
       // 4. CONDUCTOR PRINCIPAL
-      y = sh(y, '4.  Conductor Principal — NTC 2050 Art.310');
+      y = sh(y, '4.  Conductor Principal - NTC 2050 Art.310');
       tbl([
         ['Parametro','Valor'],
-        ['Calibre recomendado', document.getElementById('tot-r-calibre').textContent],
-        ['Capacidad de conduccion (ampacidad)', document.getElementById('tot-r-ampacidad').textContent],
-        ['Material', document.getElementById('tot-r-material').textContent],
-        ['Tipo de aislamiento', document.getElementById('tot-r-aislamiento').textContent],
+        ['Calibre recomendado',                san(document.getElementById('tot-r-calibre').textContent)],
+        ['Capacidad de conduccion (ampacidad)',san(document.getElementById('tot-r-ampacidad').textContent)],
+        ['Material',                            san(document.getElementById('tot-r-material').textContent)],
+        ['Tipo de aislamiento',                san(document.getElementById('tot-r-aislamiento').textContent)],
         ['Norma conductor', 'NTC 2050 Art.310 (basado en NEC)'],
       ], [90, U-90]);
 
       // 5. REFERENCIAS COMERCIALES COLOMBIA
+      checkPage(65);
       y = sh(y, '5.  Referencias Comerciales Colombia', '#142233');
       const breakerAmpPDF = parseInt(document.getElementById('tot-r-breaker').textContent);
       const tipoStr = document.getElementById('tot-r-tipo').textContent;
@@ -5219,16 +5234,17 @@ function totExportarPDF(modo = 'guardar') {
 
       // Nota rangos
       doc.setFontSize(7); doc.setFont('helvetica','normal'); tc(MUT);
-      doc.text('Breaker: ' + breakerAmpPDF + ' A — ' + tipoStr + ' | Marcas disponibles en Colombia: Schneider · ABB · WEG · CHINT · Siemens · Rockwell/A-B', ML+2, y);
+      doc.text('Breaker: ' + breakerAmpPDF + ' A - ' + san(tipoStr) + ' | Marcas disponibles en Colombia: Schneider - ABB - WEG - CHINT - Siemens - Rockwell/A-B', ML+2, y);
       y += 5;
 
-      const marcasPDF = refsPDF.map(r => [r[0], r[1].substring(0,35), r[3]]);
+      const marcasPDF = refsPDF.map(r => [san(r[0]), san(r[1].substring(0,35)), san(r[3])]);
       tbl([
         ['Marca','Referencia / Serie','Rango / Norma'],
         ...marcasPDF
       ], [36, 78, U-114]);
 
       // 6. NOTA LEGAL
+      checkPage(42);
       y = sh(y, '6.  Nota Tecnica y Legal', '#142233');
       const nota = [
         'Este calculo fue generado con ElectroCol bajo NTC 2050, RETIE Res.90708/2013 e IEC 60947.',
@@ -5237,10 +5253,10 @@ function totExportarPDF(modo = 'guardar') {
         'Verificar coordinacion de protecciones con estudio de cortocircuito (RETIE Art.16).',
       ];
       nota.forEach(n => {
-        const lines = doc.splitTextToSize('• ' + n, U-6);
+        const lines = doc.splitTextToSize('- ' + san(n), U-6);
         doc.setFontSize(7.5); doc.setFont('helvetica','normal'); tc(MUT);
         doc.text(lines, ML+3, y);
-        y += lines.length * 4;
+        y += lines.length * 4.5;
       });
 
       // FOOTER
@@ -5248,7 +5264,7 @@ function totExportarPDF(modo = 'guardar') {
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
         ln(ML, 287, W-MR, 287, '#1A2F47', 0.5);
-        tx(ML, 291, 'ElectroCol — Calculos Electricos Colombia', MUT, 7);
+        tx(ML, 291, 'ElectroCol - Calculos Electricos Colombia', MUT, 7);
         tx(W-MR, 291, 'Pagina ' + i + ' de ' + totalPages, MUT, 7, 'right');
       }
 
