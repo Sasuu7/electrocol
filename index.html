@@ -137,6 +137,7 @@ select.inp{appearance:none}
     <div class="tp"><div class="tpi">📐</div><div class="tpl">Calibre conductor</div></div>
     <div class="tp"><div class="tpi">🔧</div><div class="tpl">Interruptor</div></div>
     <div class="tp"><div class="tpi">📊</div><div class="tpl">Cortocircuito</div></div>
+    <div class="tp" onclick="go('s-tablas')"><div class="tpi">📋</div><div class="tpl">Tablas de Referencia</div></div>
   </div>
   <div class="nbanner"><div class="nbd"></div><div class="nbt"><b>Normativa vigente:</b> RETIE res. 90708/2013 · RETILAP 2010 · NTC 2050 · IEC · Red 60 Hz Colombia.</div></div>
 </div>
@@ -151,7 +152,6 @@ select.inp{appearance:none}
     <div class="cc feat" onclick="go('s-motores')"><div class="ci ic-r">⚡</div><div class="cn">Arranque de Motores</div><div class="cd">DOL, Y-Δ, Soft-starter, VFD</div><div class="cnorm">RETIE Art.18</div></div>
     <div class="cc feat" onclick="go('s-conexion');setTimeout(initConexion,50)"><div class="ci ic-b">🔌</div><div class="cn">Conexión de Motores</div><div class="cd">Triángulo, estrella, inversión</div><div class="cnorm">NTC 2050 · IEC</div></div>
     <div class="cc feat" onclick="go('s-energia')" style="grid-column:1/-1"><div class="ci ic-y">⚡</div><div class="cn">Consumo Energético</div><div class="cd">kWh, costo en pesos, análisis por motor</div><div class="cnorm">UPME · XM · Tarifa CU</div></div>
-    <div class="cc feat" onclick="go('s-tablas')" style="grid-column:1/-1"><div class="ci ic-g">📋</div><div class="cn">Tablas de Referencia</div><div class="cd">Conductores, protecciones, calibres, NTC 2050</div><div class="cnorm">NTC 2050 · RETIE</div></div>
     <div class="cc feat" onclick="go('s-totalizador')" style="grid-column:1/-1"><div class="ci ic-r">🔒</div><div class="cn">Selección de Interruptor General</div><div class="cd">Breaker principal, calibre conductor, tipo de interruptor</div><div class="cnorm">NTC 2050 · RETIE Art.16</div></div>
   </div>
 
@@ -1712,10 +1712,16 @@ function renderResultados(){
   const rCalWhy=document.getElementById('rr-calwhy');
   if(idxCal>0){
     const prev=COND_LIST[idxCal-1];
-    const diff=+(corrDis125-prev.c).toFixed(1);
-    document.getElementById('r-calwhy-lbl').textContent='¿Por qué no '+prev.a+'?';
-    document.getElementById('r-calwhy').textContent=prev.a+' solo aguanta '+prev.c+'A — le faltan '+diff+'A para los '+corrDis125+'A requeridos';
-    rCalWhy.style.display='flex';
+    // Solo mostrar el aviso si el calibre anterior realmente NO alcanza
+    if(prev.c < corrDis125){
+      const diff=+(corrDis125-prev.c).toFixed(1);
+      document.getElementById('r-calwhy-lbl').textContent='¿Por qué no '+prev.a+'?';
+      document.getElementById('r-calwhy').textContent=prev.a+' solo aguanta '+prev.c+' A — faltan '+diff+' A para los '+corrDis125+' A requeridos';
+      rCalWhy.style.display='flex';
+    } else {
+      // El calibre anterior sí alcanza eléctricamente; el seleccionado es mayor por otro criterio (ITM, distancia, etc.)
+      rCalWhy.style.display='none';
+    }
   } else {
     rCalWhy.style.display='none';
   }
@@ -2315,7 +2321,7 @@ function schnBobina(ten){
   if(ten<=220) return 'A5';
   return 'Q5';
 }
-// ABB: A2=220V, A4=110V, A6=440V
+// ABB AF-series: bobina incluida en código (-13=100-250VAC/DC, -11=24-60VAC/DC)
 function abbBobina(ten){
   if(ten<=110) return 'A4';
   if(ten<=220) return 'A2';
@@ -2336,33 +2342,33 @@ function sieBobina(ten){
 
 // CONTACTORES AC-3 — selección por FLC — 60Hz Colombia
 // Criterio: Ie >= FLC (corriente plena carga NTC 2050) — Tensión según bobina seleccionada
-// [Schneider TeSys D, ABB A-line, WEG CWM, CHINT NC1, Siemens 3RT, Rockwell 100-C]
+// [Schneider TeSys D, ABB AF-series, WEG CWM, CHINT NC1, Siemens 3RT, Rockwell 100-C]
 // Tabla base de contactores — SIN código de bobina (se agrega dinámicamente por BOBINA_V)
 // Formato: [Schneider, ABB, WEG-base, CHINT, Siemens-base, Rockwell-base]
 // Schneider sufijo bobina: A7=110VAC, A5=220VAC, Q5=440VAC, BD=24VDC
-// ABB sufijo bobina:       A4=110VAC, A2=220VAC, A6=440VAC, DC24=24VDC
+// ABB AF-series: código completo, no requiere sufijo de bobina separado
 // WEG cod bobina:          30V16=110V, 30V06=220V, 30V50=440V, 30V00=24VDC
 // CHINT sufijo:            bobina 110/220/440VAC o 24VDC
 // Siemens sufijo:          E=110V, A=220V, B=440V, C=24VDC
 // Rockwell sufijo:         EJ=110VAC, DJ=220VAC, FD=440VAC, GD=24VDC
 // CONT_REFS — base sin sufijo de bobina (se agrega en conRef según BOBINA_V)
 // Schneider: LC1Dxx — sufijos bobina: F7=110V, M7=220V, U7=240V, Q5=380V, V7=400V, BL=24VDC
-// ABB: Axx-30-10 — sufijos: A4=110V, A2=220V, A6=440V, DC24=24VDC
+// ABB: AF09..AF96-30-00/10-13 (100-250VAC/DC) o -11 (24-60VAC/DC)
 // WEG: CWMxx-11 — sufijos: 30V16=110V, 30V06=220V, 30V50=440V, 30V00=24VDC
 // CHINT: NC1-xx01 — descripción bobina al final
 // Siemens: 3RTxxxx-1 — sufijos: E=110V, A=220V, B=440V, C=24VDC
 // Rockwell: 100-Cxx — sufijos: EJ=110VAC, DJ=220VAC, FD=440VAC, GD=24VDC
 const CONT_REFS=[
-  {min:0,   max:9,   refs:['LC1D09','A9-30-10','CWM9-11','NC1-0901','3RT2015-1','100-C09']},
-  {min:9.1, max:12,  refs:['LC1D12','A12-30-10','CWM12-11','NC1-1201','3RT2016-1','100-C12']},
-  {min:12.1,max:18,  refs:['LC1D18','A18-30-10','CWM18-11','NC1-1801','3RT2017-1','100-C16']},
-  {min:18.1,max:25,  refs:['LC1D25','A26-30-10','CWM25-11','NC1-2501','3RT2023-1','100-C23']},
-  {min:25.1,max:32,  refs:['LC1D32','A30-30-10','CWM32-11','NC1-3201','3RT2024-1','100-C30']},
-  {min:32.1,max:40,  refs:['LC1D40','A40-30-10','CWM40-11','NC1-4001','3RT2025-1','100-C37']},
-  {min:40.1,max:50,  refs:['LC1D50','A50-30-10','CWM50-11','NC1-5001','3RT2026-1','100-C43']},
-  {min:50.1,max:65,  refs:['LC1D65','A63-30-10','CWM65-11','NC1-6501','3RT2034-1','100-C60']},
-  {min:65.1,max:80,  refs:['LC1D80','A75-30-10','CWM80-11','NC1-8001','3RT2035-1','100-C72']},
-  {min:80.1,max:115, refs:['LC1D115','AF96-30-00','CWM105-11','NC1-11501','3RT2044-1','100-C85']},
+  {min:0,   max:9,   refs:['LC1D09','AF09-30-10-13','CWM9-11','NC1-0901','3RT2015-1','100-C09']},
+  {min:9.1, max:12,  refs:['LC1D12','AF12-30-10-13','CWM12-11','NC1-1201','3RT2016-1','100-C12']},
+  {min:12.1,max:18,  refs:['LC1D18','AF16-30-10-13','CWM18-11','NC1-1801','3RT2017-1','100-C16']},
+  {min:18.1,max:25,  refs:['LC1D25','AF26-30-00-13','CWM25-11','NC1-2501','3RT2023-1','100-C23']},
+  {min:25.1,max:32,  refs:['LC1D32','AF30-30-00-13','CWM32-11','NC1-3201','3RT2024-1','100-C30']},
+  {min:32.1,max:40,  refs:['LC1D40','AF40-30-00-13','CWM40-11','NC1-4001','3RT2025-1','100-C37']},
+  {min:40.1,max:50,  refs:['LC1D50','AF40-30-00-13','CWM50-11','NC1-5001','3RT2026-1','100-C43']},
+  {min:50.1,max:65,  refs:['LC1D65','AF52-30-00-13','CWM65-11','NC1-6501','3RT2034-1','100-C60']},
+  {min:65.1,max:80,  refs:['LC1D80','AF65-30-00-13','CWM80-11','NC1-8001','3RT2035-1','100-C72']},
+  {min:80.1,max:115, refs:['LC1D115','AF96-30-00-13','CWM105-11','NC1-11501','3RT2044-1','100-C85']},
 ];
 
 // RELÉS TÉRMICOS — selección por FLA×FS — 60Hz Colombia
@@ -2418,64 +2424,66 @@ const GUARD_REFS=[
   // ── 10 – 16 A (MPW40) ─────────────────────────────────────────────────────
   {min:10,   max:16,   refs:['GV2-ME16 (9-14A)',     'MS132-16 (10-16A)',      'MPW40-3-U016 (10-16A)',    'NS2-25 (10-16A)',    '3RV2021-1EA10 (3.5-5A)',    '140M-C2E-C16 (10-16A)']},
   // ── 16 – 20 A (MPW40) ─────────────────────────────────────────────────────
-  {min:16,   max:20,   refs:['GV2-ME20 (13-18A)',    'MS132-20 (13-20A)',      'MPW40-3-U020 (16-20A)',    'NS2-25 (16-20A)',    '3RV2021-4AA10 (11-16A)',    '140M-C2E-C20 (16-20A)']},
+  {min:16,   max:20,   refs:['GV2-ME20 (13-18A)',    'MS132-20 (16-20A)',      'MPW40-3-U020 (16-20A)',    'NS2-25 (16-20A)',    '3RV2021-4AA10 (11-16A)',    '140M-C2E-C20 (16-20A)']},
   // ── 18 – 25 A (MPW40) — incluye rango U018 del MPW18 ──────────────────────
-  {min:20,   max:25,   refs:['GV2-ME22 (20-25A)',    'MS132-25 (16-25A)',      'MPW40-3-U025 (20-25A)',    'NS2-25 (20-25A)',    '3RV2021-4BA10 (14-20A)',    '140M-C2E-C25 (16-25A)']},
+  {min:20,   max:25,   refs:['GV2-ME22 (20-25A)',    'MS132-25 (20-25A)',      'MPW40-3-U025 (20-25A)',    'NS2-25 (20-25A)',    '3RV2021-4BA10 (14-20A)',    '140M-C2E-C25 (16-25A)']},
   // ── 25 – 32 A (MPW40) ─────────────────────────────────────────────────────
-  {min:25,   max:32,   refs:['GV2-ME32 (25-32A)',    'MS132-32 (20-32A)',      'MPW40-3-U032 (25-32A)',    'NS2-25 (25-32A)',    '3RV2021-4DA10 (22-32A)',    '140M-C2E-C32 (25-32A)']},
+  {min:25,   max:32,   refs:['GV2-ME32 (25-32A)',    'MS132-32 (25-32A)',      'MPW40-3-U032 (25-32A)',    'NS2-25 (25-32A)',    '3RV2021-4DA10 (22-32A)',    '140M-C2E-C32 (25-32A)']},
   // ── 32 – 40 A (MPW40) ─────────────────────────────────────────────────────
-  {min:32,   max:40,   refs:['GV3-ME40 (25-40A)',    'MS132-40 (26-40A)',      'MPW40-3-U040 (32-40A)',    'NS2-25 (32-40A)',    '3RV2021-4EA10 (27-32A)',    '140M-F8E-C40 (32-40A)']},
+  {min:32,   max:40,   refs:['GV3-ME40 (25-40A)',    'MS165-42 (30-42A)',      'MPW40-3-U040 (32-40A)',    'NS2-25 (32-40A)',    '3RV2021-4EA10 (27-32A)',    '140M-F8E-C40 (32-40A)']},
   // ── 40 – 50 A (MPW80) ─────────────────────────────────────────────────────
-  {min:40,   max:50,   refs:['GV3-ME63 (40-63A)',    'MS165-54 (36-54A)',      'MPW80-3-U050 (40-50A)',    'NS2-63 (40-50A)',    '3RV2031-4EA10 (35-50A)',    '140M-F8E-C50 (40-50A)']},
+  {min:40,   max:50,   refs:['GV3-ME63 (40-63A)',    'MS165-54 (40-54A)',      'MPW80-3-U050 (40-50A)',    'NS2-63 (40-50A)',    '3RV2031-4EA10 (35-50A)',    '140M-F8E-C50 (40-50A)']},
   // ── 50 – 65 A (MPW80) ─────────────────────────────────────────────────────
-  {min:50,   max:65,   refs:['GV3-ME63 (40-63A)',    'MS165-65 (48-65A)',      'MPW80-3-U065 (50-65A)',    'NS2-63 (50-65A)',    '3RV2031-4FA10 (45-63A)',    '140M-F8E-C57 (40-57A)']},
+  {min:50,   max:65,   refs:['GV3-ME63 (40-63A)',    'MS165-65 (52-65A)',      'MPW80-3-U065 (50-65A)',    'NS2-63 (50-65A)',    '3RV2031-4FA10 (45-63A)',    '140M-F8E-C57 (40-57A)']},
   // ── 65 – 80 A (MPW80) ─────────────────────────────────────────────────────
-  {min:65,   max:80,   refs:['GV3-ME80 (63-80A)',    'MS165-80 (54-80A)',      'MPW80-3-U080 (65-80A)',    'NS2-63 (65-80A)',    '3RV2031-4HA10 (55-70A)',    '140M-F8E-C80 (57-80A)']},
+  {min:65,   max:80,   refs:['GV3-ME80 (63-80A)',    'MS495-90 (70-90A)',      'MPW80-3-U080 (65-80A)',    'NS2-63 (65-80A)',    '3RV2031-4HA10 (55-70A)',    '140M-F8E-C80 (57-80A)']},
 ];
 
 // BREAKERS ITM — selección por corriente nominal — 60Hz Colombia
 // Criterio: corriente nominal = FLC×150% normalizado BSTD, curva C, 220-440V
-// [Schneider Acti9, ABB S203/S203M, WEG MDWP/MDWH, CHINT NB1-63H/NM8, Siemens 5SL6/5SY6, Rockwell 140M]
-// Referencias verificadas:
-//   Schneider 3P curva C: iC60N A9F743XX (10-63A, 6kA) | C120N A9N183XX (80-125A, 10kA)
-//   ABB 3P curva C: S203-CXX 2CDS253001R0XX4 (6-100A, 6kA) | S203M-C125 2CDS273001R0624 (125A, 10kA)
+// [Schneider Acti9, ABB S250/S290, WEG MDWP/MDWH, CHINT NB1-63H/NM8, Siemens 5SL6/5SY6, Rockwell 140M]
+// Referencias verificadas (catálogo ABB Mini Breakers):
+//   ABB 3P curva C ≤63A: S253-C10..C63 (Serie S250, 6kA IEC898, hasta 20kA IEC947)
+//     código pedido: EF 140 7 (6A) ... EF 149 8 (63A) curva C — 3P tipo S253
+//   ABB 3P curva C 80-125A: S293-C80/C100/C125 (Serie S290, 10kA IEC898, hasta 50kA IEC947)
+//     código pedido: KU 956 5 (80A) / KU 957 3 (100A) / KU 958 1 (125A) — 3P tipo S293
 //   WEG 3P curva C: MDWP-CXX-3 (10-63A, 3kA IEC 60898) | MDWH-CXX-3 (80-125A, 10kA)
 //   CHINT 3P curva C: NB1-63H 3P CXX (6-63A, 10kA) | NM8-125H 3P CXX (80-125A, 10kA)
 //   Siemens 3P curva C: 5SL6310-7 … 5SL6363-7 (10-63A) | 5SY6380-7 … 5SY6 (80-125A)
 //   Rockwell 3P curva C: 140M-C2E (≤16A) | 140M-F8E (20-63A) | 140M-H8E (80-125A)
 const BREAK_REFS=[
   // 10 A
-  {min:10,  max:10,  refs:['iC60N 3P C10 (A9F74310)','S203-C10 (2CDS253001R0104)','MDWP-C10-3','NB1-63H 3P C10','5SL6310-7 C10 3P','140M-C2E-C10 3P']},
+  {min:10,  max:10,  refs:['iC60N 3P C10 (A9F74310)','S253-C10 (EF 141 5)','MDWP-C10-3','NB1-63H 3P C10','5SL6310-7 C10 3P','140M-C2E-C10 3P']},
   // 15 A → se normaliza a 16A en IEC
-  {min:15,  max:15,  refs:['iC60N 3P C16 (A9F74316)','S203-C16 (2CDS253001R0164)','MDWP-C16-3','NB1-63H 3P C16','5SL6316-7 C16 3P','140M-C2E-C16 3P']},
+  {min:15,  max:15,  refs:['iC60N 3P C16 (A9F74316)','S253-C16 (EF 143 1)','MDWP-C16-3','NB1-63H 3P C16','5SL6316-7 C16 3P','140M-C2E-C16 3P']},
   // 16 A
-  {min:16,  max:16,  refs:['iC60N 3P C16 (A9F74316)','S203-C16 (2CDS253001R0164)','MDWP-C16-3','NB1-63H 3P C16','5SL6316-7 C16 3P','140M-C2E-C16 3P']},
+  {min:16,  max:16,  refs:['iC60N 3P C16 (A9F74316)','S253-C16 (EF 143 1)','MDWP-C16-3','NB1-63H 3P C16','5SL6316-7 C16 3P','140M-C2E-C16 3P']},
   // 20 A
-  {min:20,  max:20,  refs:['iC60N 3P C20 (A9F74320)','S203-C20 (2CDS253001R0204)','MDWP-C20-3','NB1-63H 3P C20','5SL6320-7 C20 3P','140M-F8E-C20 3P']},
+  {min:20,  max:20,  refs:['iC60N 3P C20 (A9F74320)','S253-C20 (EF 144 9)','MDWP-C20-3','NB1-63H 3P C20','5SL6320-7 C20 3P','140M-F8E-C20 3P']},
   // 25 A
-  {min:25,  max:25,  refs:['iC60N 3P C25 (A9F74325)','S203-C25 (2CDS253001R0254)','MDWP-C25-3','NB1-63H 3P C25','5SL6325-7 C25 3P','140M-F8E-C25 3P']},
+  {min:25,  max:25,  refs:['iC60N 3P C25 (A9F74325)','S253-C25 (EF 145 6)','MDWP-C25-3','NB1-63H 3P C25','5SL6325-7 C25 3P','140M-F8E-C25 3P']},
   // 30 A → se normaliza a 32A en IEC
-  {min:30,  max:30,  refs:['iC60N 3P C32 (A9F74332)','S203-C32 (2CDS253001R0324)','MDWP-C32-3','NB1-63H 3P C32','5SL6332-7 C32 3P','140M-F8E-C32 3P']},
+  {min:30,  max:30,  refs:['iC60N 3P C32 (A9F74332)','S253-C32 (EF 146 4)','MDWP-C32-3','NB1-63H 3P C32','5SL6332-7 C32 3P','140M-F8E-C32 3P']},
   // 32 A
-  {min:32,  max:32,  refs:['iC60N 3P C32 (A9F74332)','S203-C32 (2CDS253001R0324)','MDWP-C32-3','NB1-63H 3P C32','5SL6332-7 C32 3P','140M-F8E-C32 3P']},
+  {min:32,  max:32,  refs:['iC60N 3P C32 (A9F74332)','S253-C32 (EF 146 4)','MDWP-C32-3','NB1-63H 3P C32','5SL6332-7 C32 3P','140M-F8E-C32 3P']},
   // 40 A
-  {min:40,  max:40,  refs:['iC60N 3P C40 (A9F74340)','S203-C40 (2CDS253001R0404)','MDWP-C40-3','NB1-63H 3P C40','5SL6340-7 C40 3P','140M-F8E-C40 3P']},
+  {min:40,  max:40,  refs:['iC60N 3P C40 (A9F74340)','S253-C40 (EF 147 2)','MDWP-C40-3','NB1-63H 3P C40','5SL6340-7 C40 3P','140M-F8E-C40 3P']},
   // 50 A
-  {min:50,  max:50,  refs:['iC60N 3P C50 (A9F74350)','S203-C50 (2CDS253001R0504)','MDWP-C50-3','NB1-63H 3P C50','5SL6350-7 C50 3P','140M-F8E-C50 3P']},
+  {min:50,  max:50,  refs:['iC60N 3P C50 (A9F74350)','S253-C50 (EF 148 0)','MDWP-C50-3','NB1-63H 3P C50','5SL6350-7 C50 3P','140M-F8E-C50 3P']},
   // 60 A → se normaliza a 63A
-  {min:60,  max:60,  refs:['iC60N 3P C63 (A9F74363)','S203-C63 (2CDS253001R0634)','MDWP-C63-3','NB1-63H 3P C63','5SL6363-7 C63 3P','140M-F8E-C63 3P']},
+  {min:60,  max:60,  refs:['iC60N 3P C63 (A9F74363)','S253-C63 (EF 149 8)','MDWP-C63-3','NB1-63H 3P C63','5SL6363-7 C63 3P','140M-F8E-C63 3P']},
   // 63 A
-  {min:63,  max:63,  refs:['iC60N 3P C63 (A9F74363)','S203-C63 (2CDS253001R0634)','MDWP-C63-3','NB1-63H 3P C63','5SL6363-7 C63 3P','140M-F8E-C63 3P']},
+  {min:63,  max:63,  refs:['iC60N 3P C63 (A9F74363)','S253-C63 (EF 149 8)','MDWP-C63-3','NB1-63H 3P C63','5SL6363-7 C63 3P','140M-F8E-C63 3P']},
   // 70 A → se normaliza a 80A
-  {min:70,  max:70,  refs:['C120N 3P C80 (A9N18365)','S203-C80 (2CDS253001R0804)','MDWH-C80-3','NM8-125H 3P C80','5SY6380-7 C80 3P','140M-H8E-C80 3P']},
+  {min:70,  max:70,  refs:['C120N 3P C80 (A9N18365)','S293-C80 (KU 956 5)','MDWH-C80-3','NM8-125H 3P C80','5SY6380-7 C80 3P','140M-H8E-C80 3P']},
   // 80 A
-  {min:80,  max:80,  refs:['C120N 3P C80 (A9N18365)','S203-C80 (2CDS253001R0804)','MDWH-C80-3','NM8-125H 3P C80','5SY6380-7 C80 3P','140M-H8E-C80 3P']},
+  {min:80,  max:80,  refs:['C120N 3P C80 (A9N18365)','S293-C80 (KU 956 5)','MDWH-C80-3','NM8-125H 3P C80','5SY6380-7 C80 3P','140M-H8E-C80 3P']},
   // 90 A → se normaliza a 100A
-  {min:90,  max:90,  refs:['C120N 3P C100 (A9N18367)','S203-C100 (2CDS253001R0824)','MDWH-C100-3','NM8-125H 3P C100','5SY6 3P C100 (10kA)','140M-H8E-C100 3P']},
+  {min:90,  max:90,  refs:['C120N 3P C100 (A9N18367)','S293-C100 (KU 957 3)','MDWH-C100-3','NM8-125H 3P C100','5SY6 3P C100 (10kA)','140M-H8E-C100 3P']},
   // 100 A
-  {min:100, max:100, refs:['C120N 3P C100 (A9N18367)','S203-C100 (2CDS253001R0824)','MDWH-C100-3','NM8-125H 3P C100','5SY6 3P C100 (10kA)','140M-H8E-C100 3P']},
+  {min:100, max:100, refs:['C120N 3P C100 (A9N18367)','S293-C100 (KU 957 3)','MDWH-C100-3','NM8-125H 3P C100','5SY6 3P C100 (10kA)','140M-H8E-C100 3P']},
   // 110–125 A
-  {min:110, max:125, refs:['C120N 3P C125 (A9N18369)','S203M-C125 (2CDS273001R0624)','MDWH-C125-3','NM8-125H 3P C125','5SY6 3P C125 (10kA)','140M-H8E-C125 3P']},
+  {min:110, max:125, refs:['C120N 3P C125 (A9N18369)','S293-C125 (KU 958 1)','MDWH-C125-3','NM8-125H 3P C125','5SY6 3P C125 (10kA)','140M-H8E-C125 3P']},
   // 126–175 A → caja moldeada
   {min:126, max:175, refs:['NSX160F TM160D 3P (LV430830)','T1B 160 TMD160 3P (1SDA050962R1)','DWB160L160-3MF WEG','NM8-250H 3P C160','3VA1116-4EF32 3P 160A','140G-H13FA3-C160 3P']},
   // 176–300 A → caja moldeada
@@ -2502,7 +2510,7 @@ function buildCom(gm){
   function conRef(base, i){
     const ref=base[i];
     if(i===0) return ref+sb;                    // Schneider: LC1-D09A5
-    if(i===1) return ref+ab;                    // ABB: A9-30-10A2
+    if(i===1) return ref;                        // ABB AF: código ya incluye tensión de bobina (ej. AF09-30-10-13)
     if(i===2) return ref+'-'+wb;                // WEG: CWM9-11-30V06
     if(i===3) return ref+' ('+bc.chint+')';     // CHINT: NC1-0901 (220VAC 60Hz)
     if(i===4) return ref+sib+'0';               // Siemens: 3RT2015-1A0
@@ -2801,7 +2809,7 @@ function _buildPDF(){
     const cBase2=selRef(CONT_REFS,flcV);
     const cRef=cBase2.map((r,i)=>{
       if(i===0) return r+bc2.sch;  // Schneider
-      if(i===1) return r+bc2.abb;                                        // ABB
+      if(i===1) return r;                                                   // ABB AF: código ya incluye tensión bobina
       if(i===2) return r+'-'+bc2.weg;                                    // WEG
       if(i===3) return r+' ('+bc2.chint+')';                            // CHINT
       if(i===4) return r+bc2.sie+'0';                                    // Siemens
@@ -4386,66 +4394,6 @@ const TABLAS_DATA = {
       </div>`
   },
 
-  // ── TABLA 10: Factor corrección temperatura ───────────────────────────────
-  'factor-temperatura': {
-    nombre: 'Factor corrección temperatura',
-    norma: 'NTC 2050 Tabla 310-16',
-    desc: 'Reducción de amperaje por temperatura ambiente',
-    color: 'var(--acc)',
-    html: () => `
-      <div class="rb" style="margin-bottom:8px">
-        <div class="rbt">🌡️ Factores de corrección por temperatura ambiente</div>
-        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Tabla 310-16 · Base: 30°C · Multiplicar la capacidad de conducción por el factor</div>
-        <div style="overflow-x:auto">
-          <table style="width:100%;border-collapse:collapse;font-size:10px">
-            <thead>
-              <tr style="background:var(--mid)">
-                <th style="padding:7px 8px;text-align:left;color:var(--acc);font-weight:700">Temp. amb. (°C)</th>
-                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">Factor 60°C</th>
-                <th style="padding:7px 8px;text-align:center;color:var(--pr);font-weight:700">Factor 75°C</th>
-                <th style="padding:7px 8px;text-align:center;color:var(--blu);font-weight:700">Factor 90°C</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${[
-                ['10','1.22','1.15','1.10'],
-                ['15','1.17','1.12','1.08'],
-                ['20','1.13','1.09','1.05'],
-                ['25','1.07','1.04','1.03'],
-                ['30','1.00','1.00','1.00'],
-                ['35','0.94','0.96','0.97'],
-                ['40','0.88','0.91','0.93'],
-                ['45','0.82','0.87','0.90'],
-                ['50','0.75','0.82','0.86'],
-                ['55','0.67','0.76','0.82'],
-                ['60','0.58','0.71','0.77'],
-                ['65','0.47','0.65','0.73'],
-                ['70','0.35','0.58','0.68'],
-                ['75','—','0.50','0.63'],
-                ['80','—','0.41','0.58'],
-                ['85','—','—','0.52'],
-                ['90','—','—','0.45'],
-              ].map((r,i)=>{
-                const temp = parseInt(r[0]);
-                const isHot = temp > 30;
-                return `<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
-                  <td style="padding:6px 8px;color:${isHot?'var(--pr)':'var(--grn)'};font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[0]}°C</td>
-                  <td style="padding:6px 8px;text-align:center;color:${parseFloat(r[1])<1?'var(--pr)':'var(--grn)'};font-weight:600">${r[1]}</td>
-                  <td style="padding:6px 8px;text-align:center;color:${parseFloat(r[2])<1?'var(--pr)':'var(--grn)'};font-weight:600">${r[2]}</td>
-                  <td style="padding:6px 8px;text-align:center;color:${parseFloat(r[3])<1?'var(--pr)':'var(--grn)'};font-weight:600">${r[3]}</td>
-                </tr>`;
-              }).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div style="background:rgba(255,183,3,0.07);border:1px solid rgba(255,183,3,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
-        <b style="color:var(--acc)">Ejemplo:</b> Cable #10 AWG Cu 75°C = 35 A a 30°C. A 45°C → 35 × 0.87 = <b style="color:var(--pr)">30.5 A</b><br>
-        <b style="color:var(--acc)">Colombia:</b> En zonas cálidas (Caribe, Orinoquía) usar temperatura ≥ 40°C para el diseño<br>
-        <b style="color:var(--grn)">NTC 2050:</b> Aplicar factor antes de seleccionar el calibre del conductor
-      </div>`
-  },
-
   // ── TABLA 11: Factor agrupamiento conductores ─────────────────────────────
   'factor-agrupamiento': {
     nombre: 'Factor agrupamiento conductores',
@@ -4777,262 +4725,6 @@ const TABLAS_DATA = {
         <b style="color:var(--grn)">RETIE Art. 15.7:</b> Medir resistividad in situ con telurómetro antes de diseñar la malla<br>
         <b style="color:var(--acc)">Mejoradores:</b> Bentonita, GEM, sales de roca → reducen ρ efectiva hasta 10× en suelos secos<br>
         <b style="color:var(--pr)">Meta RETIE:</b> Sistema de puesta a tierra ≤ 5 Ω · Ambientes especiales ≤ 1 Ω
-      </div>`
-  },
-
-  // ── TABLA 17: Niveles de iluminancia RETILAP ──────────────────────────────
-  'iluminancia-retilap': {
-    nombre: 'Niveles iluminancia por local',
-    norma: 'RETILAP Tabla 410 · NTC 2050 Art. 410',
-    desc: 'Luxes mínimos por tipo de área o local',
-    color: 'var(--acc)',
-    html: () => `
-      <div class="rb" style="margin-bottom:8px">
-        <div class="rbt">💡 Niveles de iluminancia mínimos por tipo de local</div>
-        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">RETILAP Res. 180540/2010 Tabla 410 · Norma ICONTEC · Medición en plano de trabajo a 0.80 m del piso</div>
-        <div style="overflow-x:auto">
-          <table style="width:100%;border-collapse:collapse;font-size:10px">
-            <thead>
-              <tr style="background:var(--mid)">
-                <th style="padding:7px 8px;text-align:left;color:var(--acc);font-weight:700">Tipo de local / tarea</th>
-                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">E mín (lux)</th>
-                <th style="padding:7px 8px;text-align:center;color:var(--txt);font-weight:700">E recomen. (lux)</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${[
-                ['Áreas de tránsito exterior','20','50','var(--mut)'],
-                ['Parqueaderos cubiertos','50','100','var(--mut)'],
-                ['Pasillos y circulaciones','100','150','var(--grn)'],
-                ['Bodegas y almacenes','100','200','var(--grn)'],
-                ['Salas de espera','200','300','var(--grn)'],
-                ['Oficinas generales','300','500','var(--acc)'],
-                ['Salas de reunión','300','500','var(--acc)'],
-                ['Área de lectura y escritura','500','750','var(--acc)'],
-                ['Salas de dibujo técnico','750','1000','var(--acc)'],
-                ['Talleres mecánicos gruesos','200','300','var(--grn)'],
-                ['Talleres mecánicos finos','500','750','var(--acc)'],
-                ['Soldadura y corte','300','500','var(--acc)'],
-                ['Plantas de ensamble finas','750','1000','var(--acc)'],
-                ['Control de calidad visual','1000','2000','var(--pr)'],
-                ['Salas de operación','500','1000','var(--pr)'],
-                ['Laboratorios','500','750','var(--acc)'],
-                ['Aulas de clase','300','500','var(--acc)'],
-                ['Cocinas industriales','300','500','var(--acc)'],
-                ['Cuartos técnicos / subestaciones','200','300','var(--grn)'],
-                ['Plantas de proceso continuo','300','500','var(--acc)'],
-              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
-                <td style="padding:6px 8px;color:var(--txt);font-size:10px">${r[0]}</td>
-                <td style="padding:6px 8px;text-align:center;color:${r[3]};font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[1]}</td>
-                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:10px">${r[2]}</td>
-              </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div style="background:rgba(255,183,3,0.07);border:1px solid rgba(255,183,3,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
-        <b style="color:var(--acc)">RETILAP:</b> Obligatorio en Colombia · Resolución 180540 de 2010 (Min. de Minas y Energía)<br>
-        <b style="color:var(--acc)">Uniformidad:</b> Relación E_mín / E_media ≥ 0.80 en el plano de trabajo<br>
-        <b style="color:var(--grn)">IRC mínimo:</b> Zonas de trabajo ≥ 80 · Zonas de tránsito ≥ 40 (Índice Reproducción Cromática)<br>
-        <b style="color:var(--pr)">Eficiencia:</b> RETILAP exige eficacia mínima de luminarias — lm/W según tipo de fuente
-      </div>`
-  },
-
-  // ── TABLA 18: Eficiencia mínima luminarias RETILAP ────────────────────────
-  'eficiencia-luminarias': {
-    nombre: 'Eficiencia mínima luminarias',
-    norma: 'RETILAP · Res. 180540/2010',
-    desc: 'Eficacia mínima lm/W por tecnología de lámpara',
-    color: 'var(--acc)',
-    html: () => `
-      <div class="rb" style="margin-bottom:8px">
-        <div class="rbt">💡 Eficacia mínima de fuentes lumínicas — RETILAP Colombia</div>
-        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">RETILAP Resolución 180540/2010 · Min. Minas y Energía Colombia · Obligatorio para equipos nuevos</div>
-        <div style="overflow-x:auto">
-          <table style="width:100%;border-collapse:collapse;font-size:10px">
-            <thead>
-              <tr style="background:var(--mid)">
-                <th style="padding:7px 8px;text-align:left;color:var(--acc);font-weight:700">Tecnología</th>
-                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">Eficacia mín. (lm/W)</th>
-                <th style="padding:7px 8px;text-align:center;color:var(--txt);font-weight:600">Eficacia típica actual</th>
-                <th style="padding:7px 8px;text-align:center;color:var(--mut);font-weight:600">Vida útil (h)</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${[
-                ['LED industrial (highbay)','80','120–200','50.000–100.000','var(--grn)'],
-                ['LED panel/troffer','80','100–160','30.000–50.000','var(--grn)'],
-                ['LED calle/exterior','80','110–170','50.000–100.000','var(--grn)'],
-                ['Fluorescente T8 electrónico','75','80–100','15.000–20.000','var(--acc)'],
-                ['Fluorescente T5 electrónico','80','90–110','16.000–24.000','var(--acc)'],
-                ['Ahorrador CFL compacta','55','50–75','8.000–15.000','var(--acc)'],
-                ['Mercurio de alta presión (HQL)','40','35–60','10.000–24.000','var(--pr)'],
-                ['Sodio alta presión (HPS)','70','80–130','16.000–32.000','var(--acc)'],
-                ['Sodio baja presión (LPS)','100','100–200','14.000–18.000','var(--grn)'],
-                ['Metal halide cerámico (CDM)','75','75–110','10.000–20.000','var(--acc)'],
-                ['Halógena incandescente','10','12–25','2.000–4.000','var(--pr)'],
-                ['Incandescente estándar','—','8–15','750–1.000','var(--pr)'],
-              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
-                <td style="padding:6px 8px;color:var(--txt);font-size:10px">${r[0]}</td>
-                <td style="padding:6px 8px;text-align:center;color:${r[4]};font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[1]}</td>
-                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:9px">${r[2]}</td>
-                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:9px">${r[3]}</td>
-              </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div style="background:rgba(255,183,3,0.07);border:1px solid rgba(255,183,3,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
-        <b style="color:var(--acc)">RETILAP:</b> Prohíbe instalar fuentes por debajo de la eficacia mínima en proyectos nuevos<br>
-        <b style="color:var(--grn)">LED recomendado:</b> Mayor eficacia + vida útil larga = menor costo total de propiedad (TCO)<br>
-        <b style="color:var(--pr)">Incandescente:</b> Prohibida su comercialización en Colombia desde 2014 (Res. 181419/2010)
-      </div>`
-  },
-
-  // ── TABLA 19: Factores de demanda NTC 2050 ───────────────────────────────
-  'factores-demanda': {
-    nombre: 'Factores de demanda cargas',
-    norma: 'NTC 2050 Art. 220',
-    desc: 'Factor de demanda por tipo y número de cargas',
-    color: 'var(--blu)',
-    html: () => `
-      <div class="rb" style="margin-bottom:8px">
-        <div class="rbt">📐 Factores de demanda por tipo de carga</div>
-        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Art. 220 · RETIE · Aplica para dimensionar alimentadores y acometidas</div>
-
-        <div style="font-size:10px;color:var(--acc);font-weight:700;margin:6px 0 4px">Iluminación — Edificios comerciales (Art. 220-11)</div>
-        <div style="overflow-x:auto;margin-bottom:10px">
-          <table style="width:100%;border-collapse:collapse;font-size:10px">
-            <thead><tr style="background:var(--mid)">
-              <th style="padding:6px 8px;text-align:left;color:var(--acc)">Porción de carga total (VA)</th>
-              <th style="padding:6px 8px;text-align:center;color:var(--grn)">Factor demanda</th>
-            </tr></thead>
-            <tbody>
-              ${[['Primeros 12 500 VA','100%'],['De 12 500 a 250 000 VA','35%'],['Más de 250 000 VA','25%']
-              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
-                <td style="padding:5px 8px;color:var(--txt);font-size:10px">${r[0]}</td>
-                <td style="padding:5px 8px;text-align:center;color:var(--grn);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[1]}</td>
-              </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>
-
-        <div style="font-size:10px;color:var(--acc);font-weight:700;margin:6px 0 4px">Motores — Cargas combinadas (Art. 430-24)</div>
-        <div style="overflow-x:auto;margin-bottom:10px">
-          <table style="width:100%;border-collapse:collapse;font-size:10px">
-            <thead><tr style="background:var(--mid)">
-              <th style="padding:6px 8px;text-align:left;color:var(--acc)">Condición</th>
-              <th style="padding:6px 8px;text-align:center;color:var(--grn)">Factor</th>
-            </tr></thead>
-            <tbody>
-              ${[
-                ['Motor más grande del grupo','125% I_nominal'],
-                ['Resto de motores','100% I_nominal'],
-                ['Motores que no operan simultáneamente','Mayor de ellos'],
-              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
-                <td style="padding:5px 8px;color:var(--txt);font-size:10px">${r[0]}</td>
-                <td style="padding:5px 8px;text-align:center;color:var(--acc);font-weight:600;font-size:10px">${r[1]}</td>
-              </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>
-
-        <div style="font-size:10px;color:var(--acc);font-weight:700;margin:6px 0 4px">Tomacorrientes — Edificios (Art. 220-13)</div>
-        <div style="overflow-x:auto;margin-bottom:10px">
-          <table style="width:100%;border-collapse:collapse;font-size:10px">
-            <thead><tr style="background:var(--mid)">
-              <th style="padding:6px 8px;text-align:left;color:var(--acc)">Número de tomacorrientes</th>
-              <th style="padding:6px 8px;text-align:center;color:var(--grn)">Factor demanda</th>
-            </tr></thead>
-            <tbody>
-              ${[['1 – 10','100%'],['11 – 20','50%'],['Más de 20','25%']
-              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
-                <td style="padding:5px 8px;color:var(--txt);font-size:10px">${r[0]}</td>
-                <td style="padding:5px 8px;text-align:center;color:var(--grn);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[1]}</td>
-              </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>
-
-        <div style="font-size:10px;color:var(--acc);font-weight:700;margin:6px 0 4px">Cargas de cocina — Unidades residenciales (Art. 220-20)</div>
-        <div style="overflow-x:auto">
-          <table style="width:100%;border-collapse:collapse;font-size:10px">
-            <thead><tr style="background:var(--mid)">
-              <th style="padding:6px 8px;text-align:left;color:var(--acc)">N° unidades de cocina</th>
-              <th style="padding:6px 8px;text-align:center;color:var(--grn)">Factor demanda</th>
-            </tr></thead>
-            <tbody>
-              ${[['1','80%'],['2','75%'],['3','70%'],['4','66%'],['5','62%'],['6 – 10','56%'],['11 – 20','48%'],['21 – 30','44%'],['31 – 40','40%'],['41 – 50','36%'],['Más de 50','35%']
-              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
-                <td style="padding:5px 8px;color:var(--txt);font-size:10px">${r[0]}</td>
-                <td style="padding:5px 8px;text-align:center;color:var(--grn);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:13px">${r[1]}</td>
-              </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div style="background:rgba(74,144,217,0.07);border:1px solid rgba(74,144,217,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
-        <b style="color:var(--blu)">Uso:</b> Demanda = Carga instalada × Factor de demanda → dimensiona acometida y alimentador<br>
-        <b style="color:var(--acc)">RETIE:</b> El cálculo de demanda debe incluirse en el proyecto eléctrico (memoria de cálculo)<br>
-        <b style="color:var(--grn)">NTC 2050 Art. 220-3:</b> Carga mínima por circuito = 1500 VA para tomacorrientes de uso general
-      </div>`
-  },
-
-  // ── TABLA 20: Densidad de carga VA/m² ────────────────────────────────────
-  'densidad-carga': {
-    nombre: 'Densidad de carga VA/m²',
-    norma: 'NTC 2050 Art. 220 · RETIE',
-    desc: 'Cargas unitarias por tipo de edificación',
-    color: 'var(--blu)',
-    html: () => `
-      <div class="rb" style="margin-bottom:8px">
-        <div class="rbt">📐 Cargas unitarias mínimas por tipo de ocupación</div>
-        <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Tabla 220-3(a) · Carga por unidad de área para dimensionar la acometida y alimentadores</div>
-        <div style="overflow-x:auto">
-          <table style="width:100%;border-collapse:collapse;font-size:10px">
-            <thead>
-              <tr style="background:var(--mid)">
-                <th style="padding:7px 8px;text-align:left;color:var(--blu);font-weight:700">Tipo de edificación / uso</th>
-                <th style="padding:7px 8px;text-align:center;color:var(--acc);font-weight:700">VA/m²</th>
-                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">W/m² aprox.</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${[
-                ['Armadurías y accesorios','30','30','var(--grn)'],
-                ['Auditorios','11','11','var(--grn)'],
-                ['Bancos','39','39','var(--acc)'],
-                ['Barberías / salones de belleza','33','33','var(--acc)'],
-                ['Edificios de oficinas','39','39','var(--acc)'],
-                ['Garajes — reparación y almacenaje','5','5','var(--grn)'],
-                ['Hospitales','22','22','var(--acc)'],
-                ['Hoteles y moteles','22','22','var(--acc)'],
-                ['Industria y manufactura','22','22','var(--acc)'],
-                ['Joyerías y almacenes finos','33','33','var(--acc)'],
-                ['Lavanderías comerciales','44','44','var(--acc)'],
-                ['Almacenes de víveres','33','33','var(--acc)'],
-                ['Restaurantes','22','22','var(--acc)'],
-                ['Residencias unifamiliares','33','33','var(--acc)'],
-                ['Residencias multifamiliares','33','33','var(--acc)'],
-                ['Almacenes de ropa','33','33','var(--acc)'],
-                ['Escuelas','33','33','var(--acc)'],
-                ['Bodegas — almacenamiento','5','5','var(--grn)'],
-                ['Centros comerciales','33','33','var(--acc)'],
-                ['Plantas de proceso industrial','44','44','var(--pr)'],
-              ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
-                <td style="padding:6px 8px;color:var(--txt);font-size:10px">${r[0]}</td>
-                <td style="padding:6px 8px;text-align:center;color:${r[3]};font-weight:700;font-family:'Rajdhani',sans-serif;font-size:14px">${r[1]}</td>
-                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:10px">${r[2]}</td>
-              </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div style="background:rgba(74,144,217,0.07);border:1px solid rgba(74,144,217,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
-        <b style="color:var(--blu)">Uso:</b> Carga total = Área (m²) × VA/m² → punto de partida para el diseño de la acometida<br>
-        <b style="color:var(--blu)">Luego aplicar:</b> Factor de demanda (Tabla anterior) para obtener la demanda real<br>
-        <b style="color:var(--acc)">NTC 2050 Art. 220-3:</b> La carga calculada no puede ser menor que la carga unitaria mínima<br>
-        <b style="color:var(--pr)">RETIE:</b> Memoria de cálculo obligatoria en proyectos eléctricos presentados ante SSPD
       </div>`
   },
 
@@ -5567,9 +5259,9 @@ function totGetRefs(amp, tipo, trifasico) {
         'A9F7' + (trifasico?'6':'4') + '3' + String(amp).padStart(2,'0') + ' · Curva C · ' + p3 + ' · ' + amp + 'A · 6 kA @ 220V',
         '≤63 A · MCB · IEC 60898-1 / IEC 60947-2'],
       ['ABB',
-        'S2' + (trifasico?'03':'02') + '-C' + amp,
-        'System Pro M Compact · Curva C · ' + p3 + ' · ' + amp + 'A · 6 kA @ 400V',
-        '≤63 A · MCB · IEC 60898-1'],
+        'S2' + (trifasico?'53':'52') + '-C' + amp,
+        'Serie S250 · Curva C · ' + p3 + ' · ' + amp + 'A · 6 kA IEC898 / hasta 20 kA IEC947',
+        '≤63 A · MCB · IEC 60898-1 / IEC 60947-2'],
       ['WEG',
         'MDW-' + amp + 'C' + (trifasico?'3':'2'),
         'Termomagnético MDW · Curva C · ' + p3 + ' · ' + amp + 'A · 6 kA @ 220V',
