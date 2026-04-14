@@ -4031,54 +4031,56 @@ const TABLAS_DATA = {
       </div>`
   },
 
-  // ── TABLA 4: Calibres cable cobre THW/THWN 60°C ──────────────────────────
+  // ── TABLA 4: Calibres cable cobre THW/THWN/THHN 60°C–90°C ────────────────
   'calibres-cobre': {
     nombre: 'Calibres cable cobre THW/THWN',
     norma: 'NTC 2050 Tabla 310-16',
-    desc: 'Capacidad amp. cobre aislamiento 60°C–75°C',
+    desc: 'Capacidad amp. cobre aislamiento 60°C–75°C–90°C',
     color: 'var(--acc)',
     html: () => `
       <div class="rb" style="margin-bottom:8px">
-        <div class="rbt">🔌 Conductores de cobre — Aislamiento THW / THWN</div>
+        <div class="rbt">🔌 Conductores de cobre — THW · THWN · THHN / THWN-2 / XHHW-2</div>
         <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Tabla 310-16 · RETIE Art. 14 · Temperatura ambiente 30°C · Ducto conduit</div>
         <div style="overflow-x:auto">
           <table style="width:100%;border-collapse:collapse;font-size:10px">
             <thead>
               <tr style="background:var(--mid)">
                 <th style="padding:7px 8px;text-align:left;color:var(--acc);font-weight:700">Calibre AWG/kcmil</th>
-                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">60°C (A)</th>
-                <th style="padding:7px 8px;text-align:center;color:var(--pr);font-weight:700">75°C (A)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">60°C (A)<br><span style="font-size:8px;font-weight:400">THW</span></th>
+                <th style="padding:7px 8px;text-align:center;color:var(--pr);font-weight:700">75°C (A)<br><span style="font-size:8px;font-weight:400">THWN</span></th>
+                <th style="padding:7px 8px;text-align:center;color:#f97316;font-weight:700">90°C (A)<br><span style="font-size:8px;font-weight:400">THHN/XHHW-2</span></th>
                 <th style="padding:7px 8px;text-align:center;color:var(--mut);font-weight:600">Sección mm²</th>
               </tr>
             </thead>
             <tbody>
               ${[
-                ['14 AWG','15','20','2.08'],
-                ['12 AWG','20','25','3.31'],
-                ['10 AWG','30','35','5.26'],
-                ['8 AWG','40','50','8.37'],
-                ['6 AWG','55','65','13.3'],
-                ['4 AWG','70','85','21.1'],
-                ['3 AWG','85','100','26.7'],
-                ['2 AWG','95','115','33.6'],
-                ['1 AWG','110','130','42.4'],
-                ['1/0 AWG','125','150','53.5'],
-                ['2/0 AWG','145','175','67.4'],
-                ['3/0 AWG','165','200','85.0'],
-                ['4/0 AWG','195','230','107'],
-                ['250 kcmil','215','255','127'],
-                ['300 kcmil','240','285','152'],
-                ['350 kcmil','260','310','177'],
-                ['400 kcmil','280','335','203'],
-                ['500 kcmil','320','380','253'],
-                ['600 kcmil','355','420','304'],
-                ['750 kcmil','400','475','380'],
-                ['1000 kcmil','455','545','507'],
+                ['14 AWG','15','20','25','2.08'],
+                ['12 AWG','20','25','30','3.31'],
+                ['10 AWG','30','35','40','5.26'],
+                ['8 AWG','40','50','55','8.37'],
+                ['6 AWG','55','65','75','13.3'],
+                ['4 AWG','70','85','95','21.1'],
+                ['3 AWG','85','100','115','26.7'],
+                ['2 AWG','95','115','130','33.6'],
+                ['1 AWG','110','130','145','42.4'],
+                ['1/0 AWG','125','150','170','53.5'],
+                ['2/0 AWG','145','175','195','67.4'],
+                ['3/0 AWG','165','200','225','85.0'],
+                ['4/0 AWG','195','230','260','107'],
+                ['250 kcmil','215','255','290','127'],
+                ['300 kcmil','240','285','320','152'],
+                ['350 kcmil','260','310','350','177'],
+                ['400 kcmil','280','335','380','203'],
+                ['500 kcmil','320','380','430','253'],
+                ['600 kcmil','355','420','475','304'],
+                ['750 kcmil','400','475','535','380'],
+                ['1000 kcmil','455','545','615','507'],
               ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
                 <td style="padding:6px 8px;color:var(--acc);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:12px">${r[0]}</td>
                 <td style="padding:6px 8px;text-align:center;color:var(--grn);font-weight:600">${r[1]}</td>
                 <td style="padding:6px 8px;text-align:center;color:var(--pr);font-weight:600">${r[2]}</td>
-                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:9px">${r[3]}</td>
+                <td style="padding:6px 8px;text-align:center;color:#f97316;font-weight:600">${r[3]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:9px">${r[4]}</td>
               </tr>`).join('')}
             </tbody>
           </table>
@@ -4088,57 +4090,60 @@ const TABLAS_DATA = {
         <b style="color:var(--acc)">NTC 2050 Art. 310:</b> El calibre mínimo para circuitos derivados es #14 AWG (15A)<br>
         <b style="color:var(--acc)">Factor de corrección:</b> Para temperaturas &gt; 30°C aplicar factor de la tabla 310-16<br>
         <b style="color:var(--acc)">3 conductores en ducto:</b> Aplicar factor 0.80 si hay más de 3 conductores cargados<br>
+        <b style="color:#f97316">90°C (THHN/XHHW-2):</b> La capacidad de 90°C solo se usa con corrección de temperatura; terminales limitan a 75°C<br>
         <b style="color:var(--pr)">RETIE:</b> Cable mínimo para motores = 125% × I_nominal del motor
       </div>`
   },
 
-  // ── TABLA 5: Calibres cable aluminio THWN ────────────────────────────────
+  // ── TABLA 5: Calibres cable aluminio THWN/XHHW-2 ────────────────────────
   'calibres-aluminio': {
     nombre: 'Calibres cable aluminio THWN',
     norma: 'NTC 2050 Tabla 310-16',
-    desc: 'Capacidad amp. aluminio aislamiento 75°C',
+    desc: 'Capacidad amp. aluminio aislamiento 60°C–75°C–90°C',
     color: 'var(--blu)',
     html: () => `
       <div class="rb" style="margin-bottom:8px">
-        <div class="rbt">🔌 Conductores de aluminio — Aislamiento THWN / XHHW</div>
+        <div class="rbt">🔌 Conductores de aluminio — THWN · XHHW · XHHW-2 / USE-2</div>
         <div style="font-size:9px;color:var(--mut);margin-bottom:8px">NTC 2050 Tabla 310-16 · RETIE Art. 14 · Temperatura ambiente 30°C · Ducto conduit</div>
         <div style="overflow-x:auto">
           <table style="width:100%;border-collapse:collapse;font-size:10px">
             <thead>
               <tr style="background:var(--mid)">
                 <th style="padding:7px 8px;text-align:left;color:var(--blu);font-weight:700">Calibre AWG/kcmil</th>
-                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">60°C (A)</th>
-                <th style="padding:7px 8px;text-align:center;color:var(--pr);font-weight:700">75°C (A)</th>
+                <th style="padding:7px 8px;text-align:center;color:var(--grn);font-weight:700">60°C (A)<br><span style="font-size:8px;font-weight:400">THWN</span></th>
+                <th style="padding:7px 8px;text-align:center;color:var(--pr);font-weight:700">75°C (A)<br><span style="font-size:8px;font-weight:400">XHHW</span></th>
+                <th style="padding:7px 8px;text-align:center;color:#f97316;font-weight:700">90°C (A)<br><span style="font-size:8px;font-weight:400">XHHW-2/USE-2</span></th>
                 <th style="padding:7px 8px;text-align:center;color:var(--mut);font-weight:600">Sección mm²</th>
               </tr>
             </thead>
             <tbody>
               ${[
-                ['12 AWG','15','20','3.31'],
-                ['10 AWG','25','30','5.26'],
-                ['8 AWG','30','40','8.37'],
-                ['6 AWG','40','50','13.3'],
-                ['4 AWG','55','65','21.1'],
-                ['3 AWG','65','75','26.7'],
-                ['2 AWG','75','90','33.6'],
-                ['1 AWG','85','100','42.4'],
-                ['1/0 AWG','100','120','53.5'],
-                ['2/0 AWG','115','135','67.4'],
-                ['3/0 AWG','130','155','85.0'],
-                ['4/0 AWG','150','180','107'],
-                ['250 kcmil','170','205','127'],
-                ['300 kcmil','190','230','152'],
-                ['350 kcmil','210','250','177'],
-                ['400 kcmil','225','270','203'],
-                ['500 kcmil','260','310','253'],
-                ['600 kcmil','285','340','304'],
-                ['750 kcmil','320','385','380'],
-                ['1000 kcmil','375','445','507'],
+                ['12 AWG','15','20','25','3.31'],
+                ['10 AWG','25','30','35','5.26'],
+                ['8 AWG','30','40','45','8.37'],
+                ['6 AWG','40','50','60','13.3'],
+                ['4 AWG','55','65','75','21.1'],
+                ['3 AWG','65','75','85','26.7'],
+                ['2 AWG','75','90','100','33.6'],
+                ['1 AWG','85','100','115','42.4'],
+                ['1/0 AWG','100','120','135','53.5'],
+                ['2/0 AWG','115','135','150','67.4'],
+                ['3/0 AWG','130','155','175','85.0'],
+                ['4/0 AWG','150','180','205','107'],
+                ['250 kcmil','170','205','230','127'],
+                ['300 kcmil','190','230','260','152'],
+                ['350 kcmil','210','250','280','177'],
+                ['400 kcmil','225','270','305','203'],
+                ['500 kcmil','260','310','350','253'],
+                ['600 kcmil','285','340','385','304'],
+                ['750 kcmil','320','385','435','380'],
+                ['1000 kcmil','375','445','500','507'],
               ].map((r,i)=>`<tr style="background:${i%2===0?'transparent':'rgba(143,163,180,0.04)'}">
                 <td style="padding:6px 8px;color:var(--blu);font-weight:700;font-family:'Rajdhani',sans-serif;font-size:12px">${r[0]}</td>
                 <td style="padding:6px 8px;text-align:center;color:var(--grn);font-weight:600">${r[1]}</td>
                 <td style="padding:6px 8px;text-align:center;color:var(--pr);font-weight:600">${r[2]}</td>
-                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:9px">${r[3]}</td>
+                <td style="padding:6px 8px;text-align:center;color:#f97316;font-weight:600">${r[3]}</td>
+                <td style="padding:6px 8px;text-align:center;color:var(--mut);font-size:9px">${r[4]}</td>
               </tr>`).join('')}
             </tbody>
           </table>
@@ -4147,6 +4152,7 @@ const TABLAS_DATA = {
       <div style="background:rgba(74,144,217,0.07);border:1px solid rgba(74,144,217,0.2);border-radius:8px;padding:9px 11px;font-size:9px;color:var(--mut);line-height:1.7">
         <b style="color:var(--blu)">Calibre mínimo aluminio:</b> #12 AWG (NTC 2050 Art. 310-5)<br>
         <b style="color:var(--blu)">vs Cobre:</b> Aluminio requiere ~2 calibres más grueso para igual amperaje<br>
+        <b style="color:#f97316">90°C (XHHW-2/USE-2):</b> Solo aplicable con corrección de temperatura; terminales limitan uso real a 75°C<br>
         <b style="color:var(--acc)">Uso en Colombia:</b> Acometidas, alimentadores y circuitos de alta potencia<br>
         <b style="color:var(--pr)">RETIE:</b> Prohibido usar aluminio en calibres menores a #8 AWG para instalaciones fijas
       </div>`
